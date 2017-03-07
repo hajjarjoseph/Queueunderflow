@@ -10,7 +10,7 @@
     <application
         android:name=".ApplicationDelegate"
         android:allowBackup="true"
-        android:icon="@drawable/flowiboss"
+        android:icon="@drawable/owlicon"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">

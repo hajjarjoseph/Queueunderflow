@@ -1,50 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:background="#334b5f">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#d3d3d3">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:background="@layout/questitemcell"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="5dp"
         android:layout_marginLeft="1dp"
-        android:layout_marginRight="1dp">
+        android:layout_marginRight="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@layout/questitemcell">
 
         <TextView
+            android:id="@+id/postOwner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="#username"
-            android:id="@+id/postOwner"
-            android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
-            android:textSize="16sp"
-            android:layout_marginTop="5dp"
+            android:layout_alignParentTop="true"
             android:layout_marginLeft="5dp"
-            android:textColor="#000000"/>
+            android:layout_marginTop="5dp"
+            android:text="#username"
+            android:textColor="#000000"
+            android:textSize="16sp" />
 
         <android.support.v4.view.ViewPager
             android:id="@+id/pager_introduction"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:fitsSystemWindows="true"
-            tools:listitem="@layout/pager_item"
-            android:background="@layout/imiborder"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/postTitle"
             android:layout_marginTop="20dp"
-            android:contextClickable="false"/>
+            android:background="@layout/imiborder"
+            android:contextClickable="false"
+            android:fitsSystemWindows="true"
+            tools:listitem="@layout/pager_item" />
 
         <RelativeLayout
+            android:id="@+id/relativeLayout4"
             android:layout_width="match_parent"
             android:layout_height="25dp"
             android:layout_below="@+id/pager_introduction"
             android:layout_centerHorizontal="true"
-            android:id="@+id/relativeLayout4"
             android:layout_marginBottom="20dp">
 
             <LinearLayout
@@ -52,112 +52,111 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
                 android:gravity="center"
-                android:orientation="horizontal"
-                android:layout_marginTop="10dp"/>
+                android:orientation="horizontal" />
 
         </RelativeLayout>
 
         <TextView
+            android:id="@+id/postTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Text"
-            android:id="@+id/postTitle"
-            android:layout_below="@+id/postOwner"
-            android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/postOwner"
+            android:layout_marginTop="20dp"
             android:gravity="center"
+            android:text="New Text"
             android:textColor="#000000"
-            android:textStyle="bold"
             android:textSize="18sp"
-            android:layout_marginTop="20dp"/>
+            android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/postDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Text"
-            android:id="@+id/postDescription"
-            android:layout_below="@+id/relativeLayout4"
-            android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/relativeLayout4"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
+            android:text="New Text"
             android:textColor="#000000"
-            android:textSize="15sp"
-            />
+            android:textSize="15sp" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            android:layout_below="@+id/postDescription"
             android:layout_alignParentStart="true"
+            android:layout_below="@+id/postDescription"
             android:layout_marginTop="10dp"
             android:background="@layout/answerborder">
 
             <ImageView
+                android:id="@+id/imageView11"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:id="@+id/imageView11"
-                android:src="@drawable/thumbsup"
-                android:layout_alignParentTop="true"
                 android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="50dp"
                 android:layout_marginTop="15dp"
-                android:layout_marginLeft="50dp"/>
+                android:src="@drawable/thumbsup" />
 
             <ImageView
+                android:id="@+id/imageView12"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:id="@+id/imageView12"
-                android:src="@drawable/thumsdown"
+                android:layout_alignStart="@+id/imageView11"
                 android:layout_below="@+id/textView13"
-                android:layout_alignStart="@+id/imageView11"/>
+                android:src="@drawable/thumsdown" />
 
             <TextView
+                android:id="@+id/textView13"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="60"
-                android:id="@+id/textView13"
                 android:layout_centerVertical="true"
-                android:layout_toEndOf="@+id/imageView11"
                 android:layout_marginLeft="5dp"
-                android:textSize="12sp"/>
+                android:layout_toEndOf="@+id/imageView11"
+                android:text="60"
+                android:textSize="12sp" />
 
             <ImageView
+                android:id="@+id/imageView13"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:id="@+id/imageView13"
-                android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
-                android:src="@drawable/commentbut"/>
+                android:layout_centerVertical="true"
+                android:src="@drawable/commentbut" />
 
             <ImageView
+                android:id="@+id/imageView14"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:id="@+id/imageView14"
-                android:layout_centerVertical="true"
                 android:layout_alignParentEnd="true"
-                android:src="@drawable/sharebut"
-                android:layout_marginRight="30dp"/>
+                android:layout_centerVertical="true"
+                android:layout_marginRight="30dp"
+                android:src="@drawable/sharebut" />
         </RelativeLayout>
 
         <ImageView
+            android:id="@+id/imageView15"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:id="@+id/imageView15"
-            android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/menudots"
-            android:layout_marginTop="5dp"/>
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/menudots" />
 
         <TextView
+            android:id="@+id/timeago"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="time"
-            android:id="@+id/timeago"
-            android:layout_below="@+id/postOwner"
-            android:layout_alignStart="@+id/postOwner"
             android:layout_alignParentEnd="true"
-            android:textSize="10sp"/>
+            android:layout_alignStart="@+id/postOwner"
+            android:layout_below="@+id/postOwner"
+            android:text="time"
+            android:textSize="10sp" />
 
 
     </RelativeLayout>

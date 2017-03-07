@@ -12,6 +12,7 @@ import com.example.joseph.queueunderflow.QuestItem;
 import com.example.joseph.queueunderflow.QuestRecycler;
 import com.example.joseph.queueunderflow.R;
 import com.example.joseph.queueunderflow.basicpost.BasicPost;
+import com.example.joseph.queueunderflow.basicpost.basicanswer.BasicAnswer;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
 import com.example.joseph.queueunderflow.headquarters.skills.SkillLoader;
@@ -79,6 +80,7 @@ public class QuestionsList extends AppCompatActivity {
                             Date postDate = userData.getCreatedAt();
                             String postId = userData.getObjectId();
                             ArrayList<String> tags = (ArrayList<String>) userData.get("tags");
+                            ArrayList<String> answersId = (ArrayList<String>) userData.get("answers");
 
 
                             ArrayList<String> images = new ArrayList<String>();
@@ -87,7 +89,7 @@ public class QuestionsList extends AppCompatActivity {
                             if(qImage == null){
 
                                 // Create BasicQuestion with no images
-                                BasicQuestion basicQuestion = new BasicQuestion(owner,title,description,postId,postDate,tags);
+                                BasicQuestion basicQuestion = new BasicQuestion(owner,title,description,postId,postDate,tags,answersId);
                                 items.add(basicQuestion);
 
                             }else{
@@ -122,7 +124,8 @@ public class QuestionsList extends AppCompatActivity {
                                 }
 
                                 //Create ImageQuestion
-                                ImageQuestion imageQuestion = new ImageQuestion(owner,title,description,postId,postDate,tags,images);
+                                ImageQuestion imageQuestion = new ImageQuestion(owner,title,description,postId,postDate,tags,answersId,images);
+
                                 items.add(imageQuestion);
                             }
 

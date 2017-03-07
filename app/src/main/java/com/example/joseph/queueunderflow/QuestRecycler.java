@@ -117,9 +117,13 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, CardPage.class);
+                    /*
                     ArrayList<BasicPost> newItems = new ArrayList<BasicPost>();
                     newItems.add(items.get(position));
-                    intent.putExtra("items",newItems);
+                    */
+
+
+                    intent.putExtra("postDetail",items.get(position));
                      context.startActivity(intent);
                 }
             });

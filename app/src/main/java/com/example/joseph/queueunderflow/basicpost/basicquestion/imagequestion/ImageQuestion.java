@@ -1,5 +1,6 @@
 package com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion;
 
+import com.example.joseph.queueunderflow.basicpost.basicanswer.BasicAnswer;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 
 import java.io.Serializable;
@@ -13,8 +14,8 @@ public class ImageQuestion extends BasicQuestion implements Serializable {
 
     private ArrayList<String> imagesUri;
 
-    public ImageQuestion(String qOwner, String qTitle, String qDescription, String postId, Date postDate, ArrayList<String> tags, ArrayList<String>imagesUri){
-        super(qOwner,qTitle,qDescription,postId,postDate,tags);
+    public ImageQuestion(String qOwner, String qTitle, String qDescription, String postId, Date postDate, ArrayList<String> tags,ArrayList<String> answersId, ArrayList<String>imagesUri){
+        super(qOwner,qTitle,qDescription,postId,postDate,tags,answersId);
         this.imagesUri = new ArrayList<>();
         for(int i=0;i<imagesUri.size();i++){
             this.imagesUri.add(imagesUri.get(i));

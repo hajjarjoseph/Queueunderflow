@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -49,6 +50,8 @@ public class CardPage extends AppCompatActivity  {
 
     private ArrayList<BasicPost> items;
 
+    private BasicQuestion theQuestion;
+
     private String  questId;
     private String  owner;
 
@@ -63,7 +66,6 @@ public class CardPage extends AppCompatActivity  {
             Window window = this.getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(this.getResources().getColor(R.color.statusBar));
         }
 
 
@@ -71,14 +73,15 @@ public class CardPage extends AppCompatActivity  {
 
 
         if (extras != null) {
-            items = (ArrayList<BasicPost>) extras.getSerializable("items");
+            theQuestion = (BasicQuestion) extras.getSerializable("postDetail");
         }
 
 
         mLinearLayoutManager = new LinearLayoutManager(this);
         poslv.setLayoutManager(mLinearLayoutManager);
 
-        mAdapter = new PostRecycler(CardPage.this,items,mAdapter);
+
+        mAdapter = new PostRecycler(CardPage.this,theQuestion,mAdapter);
 
         poslv.setAdapter(mAdapter);
 
@@ -94,7 +97,7 @@ public class CardPage extends AppCompatActivity  {
         protected Void doInBackground(Void... params) {
 
             ParseQuery fetchUser = new ParseQuery("Answers");
-            fetchUser.whereEqualTo("posterid", items.get(0).getPostId());
+            fetchUser.whereContainedIn("objectId",theQuestion.getAnswersId());
             fetchUser.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(java.util.List<ParseObject> objects, ParseException e) {
@@ -115,9 +118,11 @@ public class CardPage extends AppCompatActivity  {
                             if(qImage == null){
 
                                 // Create BasicQuestion with no images
-                                BasicAnswer basicQuestion = new BasicAnswer(owner,description,postId,postDate,false);
-                                items.add(basicQuestion);
-                                mAdapter.notifyDataSetChanged();
+                                BasicAnswer basicAnswer = new BasicAnswer(owner,description,postId,postDate,false);
+                                ArrayList<BasicAnswer> answers = theQuestion.getAnswersList();
+                                answers.add(basicAnswer);
+                                theQuestion.setAnswersList(answers);
+
 
                             }else {
                                 String imageUrl = qImage.getUrl();//live url
@@ -150,15 +155,41 @@ public class CardPage extends AppCompatActivity  {
 
                                 }
 
-                                ImageAnswer imageQuestion = new ImageAnswer(owner,description,postId,postDate,images,false);
-                                items.add(imageQuestion);
-                                mAdapter.notifyDataSetChanged();
+                                ImageAnswer imageAnswer = new ImageAnswer(owner,description,postId,postDate,images,false);
+                                ArrayList<BasicAnswer> answers = theQuestion.getAnswersList();
+                                answers.add(imageAnswer);
+                                theQuestion.setAnswersList(answers);
                             }
 
 
 
 
                         }
+
+                        //Rearrange Order
+                        ArrayList<String> theIds = theQuestion.getAnswersId();
+                        ArrayList<BasicAnswer> answersList = theQuestion.getAnswersList();
+                        int answerSize = theIds.size();
+                        for(int i=0;i<answerSize;i++){
+                            if(!answersList.get(i).getPostId().equals(theIds.get(i))){
+                                String theId = answersList.get(i).getPostId();
+                                for(int z=0;z<answerSize;z++){
+                                    if(theId.equals(theIds.get(z))){
+                                        //swap
+                                        BasicAnswer prevAns = answersList.get(i);
+                                        BasicAnswer currAns = answersList.get(z);
+                                        answersList.set(i,currAns);
+                                        answersList.set(z,prevAns);
+
+                                        break;
+
+                                    }
+                                }
+                            }
+                        }
+
+                        theQuestion.setAnswersList(answersList);
+                        mAdapter.notifyDataSetChanged();
 
 
                     }

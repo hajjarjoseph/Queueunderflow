@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorBg"> #2d3f51</color>
+    <color name="appMain">#32BEA6</color>
     <color name="statusBar"> #1f2e3a</color>
 
 </resources>

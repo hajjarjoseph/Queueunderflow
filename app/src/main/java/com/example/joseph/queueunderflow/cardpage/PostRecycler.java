@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.example.joseph.queueunderflow.QuestItem;
 import com.example.joseph.queueunderflow.R;
 import com.example.joseph.queueunderflow.basicpost.BasicPost;
+import com.example.joseph.queueunderflow.basicpost.basicanswer.BasicAnswer;
 import com.example.joseph.queueunderflow.basicpost.basicanswer.imageanswer.ImageAnswer;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
@@ -76,6 +77,9 @@ import butterknife.BindView;
 public class PostRecycler extends RecyclerView.Adapter<PostRecycler.PhotoHolder>  {
 
     private ArrayList<BasicPost> items;
+    private BasicQuestion theQuestion;
+    private ArrayList<BasicAnswer> answersList;
+
 
 private RecyclerView postlv;
 
@@ -83,11 +87,12 @@ private RecyclerView postlv;
     private  PostRecycler mAdapter;
 
 
-    public PostRecycler(CardPage mainActivity, ArrayList<BasicPost> items, PostRecycler mAdapter) {
+    public PostRecycler(CardPage mainActivity,BasicQuestion theQuestion, PostRecycler mAdapter) {
 
         context = mainActivity;
-        this.items = items;
+        this.theQuestion = theQuestion;
         this.mAdapter = mAdapter;
+        this.answersList = new ArrayList<>();
 
 
 
@@ -95,12 +100,10 @@ private RecyclerView postlv;
 
     @Override
     public int getItemViewType(int position) {
-        if(items.get(position) instanceof ImageQuestion || items.get(position) instanceof BasicQuestion){
-            return 1;
-        }else if(items.get(position) instanceof ImageAnswer){
+        if(position == 0){
             return 0;
         }else{
-            return 0;
+            return 1;
         }
 
     }
@@ -111,13 +114,13 @@ private RecyclerView postlv;
 
         View   inflatedView = null;
         switch (viewType) {
-            case 0:
+            case 1:
                  inflatedView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.answerwimage, parent, false);
                 return new PhotoHolder(inflatedView);
 
 
-            case 1:
+            case 0:
                  inflatedView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.postwimage, parent, false);
                 return new PhotoHolder(inflatedView);
@@ -139,18 +142,25 @@ private RecyclerView postlv;
         String title = "";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        long time = items.get(position).getPostDate().getTime();
+        long time = theQuestion.getPostDate().getTime();
         long now = System.currentTimeMillis();
 
 
-        if(getItemViewType(position) == 0){
-            holder.postOwner.setText(items.get(position).getqOwner().toString());
+        if(getItemViewType(position) == 1){
+
+            answersList = theQuestion.getAnswersList();
 
 
-            holder.postDescription.setText(items.get(position).getqDescription().toString());
+            BasicAnswer theAnswer = answersList.get(position-1);
 
-            if(items.get(position) instanceof ImageAnswer){
-                ArrayList<String> urlList = ((ImageAnswer)items.get(position)).getImagesUri();
+
+            holder.postOwner.setText(theAnswer.getqOwner().toString());
+
+
+            holder.postDescription.setText(theAnswer.getqDescription().toString());
+
+            if(theAnswer instanceof ImageAnswer){
+                ArrayList<String> urlList = ((ImageAnswer) theAnswer).getImagesUri();
                 ArrayList<Uri>uriList = new ArrayList<>();
                 for(int i=0;i<urlList.size();i++){
                     Uri imageUri = Uri.parse(urlList.get(i).toString());
@@ -193,16 +203,20 @@ private RecyclerView postlv;
 
             holder.setUiPageViewController();
 
-        }else if(getItemViewType(position) == 1){
-            holder.postOwner.setText(items.get(position).getqOwner().toString());
 
 
-            title = ((BasicQuestion)items.get(position)).getqTitle();
+        }else if(getItemViewType(position) == 0){
+            holder.postOwner.setText(theQuestion.getqOwner().toString());
+
+
+            title = theQuestion.getqTitle().toString();
             holder.postTitle.setText(title);
-            holder.postDescription.setText(items.get(position).getqDescription().toString());
+            holder.postDescription.setText(theQuestion.getqDescription().toString());
 
-            if(items.get(position) instanceof ImageQuestion){
-                ArrayList<String> urlList = ((ImageQuestion)items.get(position)).getImagesUri();
+
+
+            if(theQuestion instanceof ImageQuestion){
+                ArrayList<String> urlList = ((ImageQuestion) theQuestion).getImagesUri();
                 ArrayList<Uri>uriList = new ArrayList<>();
                 for(int i=0;i<urlList.size();i++){
                     Uri imageUri = Uri.parse(urlList.get(i).toString());
@@ -256,7 +270,9 @@ private RecyclerView postlv;
 
     @Override
     public int getItemCount() {
-        return items.size();
+        int number = 1;
+        number += theQuestion.getAnswersList().size();
+        return number;
     }
 
 
