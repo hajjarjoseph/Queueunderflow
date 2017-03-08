@@ -79,6 +79,7 @@ public class QuestionsList extends AppCompatActivity {
                             String description = userData.getString("description");
                             Date postDate = userData.getCreatedAt();
                             String postId = userData.getObjectId();
+                            boolean hasAnswer = userData.getBoolean("hasAnswer");
                             ArrayList<String> tags = (ArrayList<String>) userData.get("tags");
                             ArrayList<String> answersId = (ArrayList<String>) userData.get("answers");
 
@@ -90,6 +91,7 @@ public class QuestionsList extends AppCompatActivity {
 
                                 // Create BasicQuestion with no images
                                 BasicQuestion basicQuestion = new BasicQuestion(owner,title,description,postId,postDate,tags,answersId);
+                                basicQuestion.setHasAnswer(hasAnswer);
                                 items.add(basicQuestion);
 
                             }else{
@@ -125,7 +127,7 @@ public class QuestionsList extends AppCompatActivity {
 
                                 //Create ImageQuestion
                                 ImageQuestion imageQuestion = new ImageQuestion(owner,title,description,postId,postDate,tags,answersId,images);
-
+                                imageQuestion.setHasAnswer(hasAnswer);
                                 items.add(imageQuestion);
                             }
 

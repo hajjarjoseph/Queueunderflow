@@ -3,6 +3,8 @@ package com.example.joseph.queueunderflow;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
@@ -10,12 +12,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.NoAnimation;
 import com.example.joseph.queueunderflow.authentication.IntroPage;
 import com.example.joseph.queueunderflow.authentication.askquestion.AskQuestionMain;
 import com.example.joseph.queueunderflow.basicpost.BasicPost;
@@ -31,6 +37,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -111,6 +118,12 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
                 holder.timeAgo.setText(ago);
             }
 
+            holder.optionBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    optionAlert(items.get(position).getPostId().toString());
+                }
+            });
 
 
             holder.cardBox.setOnClickListener(new View.OnClickListener() {
@@ -153,6 +166,7 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
         TextView titleqItem;
         TextView skillName1;
         ImageView skillPic1;
+        ImageView optionBtn;
         RelativeLayout cardBox;
         TextView timeAgo;
 
@@ -176,6 +190,7 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
             titleqItem=(TextView) v.findViewById(R.id.titleqItem);
             skillName1=(TextView) v.findViewById(R.id.skillNameqItem1);
             skillPic1=(ImageView) v.findViewById(R.id.skillPicqItem1);
+            optionBtn=(ImageView) v.findViewById(R.id.optionBtn);
             cardBox=(RelativeLayout) v.findViewById(R.id.cardBox);
             timeAgo = (TextView ) v.findViewById(R.id.timestamp);
 
@@ -218,6 +233,78 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
 
 
 
+    public void confirmationAlert(final String postId){
+        final Dialog dialog = new Dialog(context);
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+
+        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        dialog.setContentView(R.layout.answerdialog);
+
+        final TextView answerMsg = (TextView) dialog.findViewById(R.id.answerMsg);
+        final TextView yesBtn = (TextView) dialog.findViewById(R.id.yesBtnAns);
+        final TextView noBtn = (TextView) dialog.findViewById(R.id.noBtnAns);
+        final ProgressBar prog = (ProgressBar) dialog.findViewById(R.id.progressAns);
+        final ImageView doneImg = (ImageView) dialog.findViewById(R.id.doneImg);
+
+        answerMsg.setText("Are you sure you want to flag this post?");
+
+        prog.setVisibility(View.INVISIBLE);
+        doneImg.setVisibility(View.INVISIBLE);
+
+        yesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                answerMsg.setVisibility(View.INVISIBLE);
+                yesBtn.setVisibility(View.INVISIBLE);
+                noBtn.setVisibility(View.INVISIBLE);
+                prog.setVisibility(View.VISIBLE);
+
+                prog.getIndeterminateDrawable().setColorFilter(Color.parseColor("#32BEA6"), PorterDuff.Mode.SRC_IN);
+
+                ParseQuery query = new ParseQuery("Questions");
+                query.whereEqualTo("objectId",postId);
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(java.util.List<ParseObject> objects, ParseException e) {
+                        if (e == null) {
+                            for (final ParseObject userData : objects) {
+                                userData.put("flagged",true);
+
+                                userData.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if(e == null){
+                                            prog.setVisibility(View.INVISIBLE);
+                                            dialog.dismiss();
+                                            thankYouMessage();
+
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+
+
+            }
+        });
+
+        noBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
+    }
+
+
     public void createAlert(String message){
         final Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.customdialog);
@@ -232,6 +319,36 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
                 dialog.dismiss();
             }
         });
+        dialog.show();
+    }
+
+    public void thankYouMessage(){
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        dialog.setContentView(R.layout.thankyoumessage);
+
+        dialog.show();
+    }
+
+    public void optionAlert(final String postId){
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        dialog.setContentView(R.layout.optiondialog);
+
+        RelativeLayout flagLayout = (RelativeLayout) dialog.findViewById(R.id.flagPost);
+
+        flagLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                confirmationAlert(postId);
+            }
+        });
+
+
         dialog.show();
     }
 

@@ -3,12 +3,12 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">#334b5f</item>
-        <item name="colorPrimaryDark">#334b5f</item>
+        <item name="colorPrimary">@color/appMain</item>
+        <item name="colorPrimaryDark">@color/appMain</item>
         <item name="android:statusBarColor">#1e7566</item>
-        <item name="colorAccent">#334b5f</item>
+        <item name="colorAccent">@color/appMain</item>
 
-        <item name="android:textColorHint">#334b5f</item>
+        <item name="android:textColorHint">@color/appMain</item>
     </style>
 
     <style name="FooBar" parent="Theme.AppCompat.Light.NoActionBar">

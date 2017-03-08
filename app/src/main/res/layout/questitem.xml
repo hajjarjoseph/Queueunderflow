@@ -50,7 +50,7 @@
 
             android:layout_below="@+id/userqItem"
             android:layout_alignStart="@+id/userqItem"
-            android:layout_toStartOf="@+id/imageView10"/>
+            android:layout_toStartOf="@+id/optionBtn"/>
 
         <ImageView
             android:layout_width="wrap_content"
@@ -139,7 +139,7 @@
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:id="@+id/imageView10"
+            android:id="@+id/optionBtn"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:src="@drawable/menudots"

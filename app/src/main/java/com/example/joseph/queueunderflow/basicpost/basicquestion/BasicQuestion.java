@@ -21,10 +21,14 @@ public class BasicQuestion extends BasicPost implements Serializable {
     private ArrayList<BasicAnswer> answersList;
 
 
+    private boolean hasAnswer;
+
+
     private ArrayList<String> answersId;
 
     public BasicQuestion(String qOwner, String qTitle, String qDescription, String postId, Date postDate,ArrayList<String>tags,ArrayList<String>answersId){
         super(qOwner,qDescription,postId,postDate);
+        this.hasAnswer = false;
         this.qTitle = qTitle;
         this.tags = new ArrayList<>();
         for(int i=0;i<tags.size();i++){
@@ -71,6 +75,15 @@ public class BasicQuestion extends BasicPost implements Serializable {
     public void setAnswersId(ArrayList<String> answersId) {
         this.answersId = answersId;
     }
+
+    public boolean isHasAnswer() {
+        return hasAnswer;
+    }
+
+    public void setHasAnswer(boolean hasAnswer) {
+        this.hasAnswer = hasAnswer;
+    }
+
 
 
 }

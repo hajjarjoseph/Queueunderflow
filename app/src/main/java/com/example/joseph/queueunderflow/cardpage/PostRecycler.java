@@ -6,6 +6,8 @@ package com.example.joseph.queueunderflow.cardpage;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
@@ -16,10 +18,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -61,13 +66,18 @@ import com.example.joseph.queueunderflow.headquarters.skills.SkillsRecycler;
 import com.example.joseph.queueunderflow.viewpager.ViewPagerAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import android.os.Handler;
+import java.util.zip.InflaterInputStream;
 
 import butterknife.BindView;
 
@@ -145,7 +155,7 @@ private RecyclerView postlv;
         long time = theQuestion.getPostDate().getTime();
         long now = System.currentTimeMillis();
 
-
+        //It's An answer
         if(getItemViewType(position) == 1){
 
             answersList = theQuestion.getAnswersList();
@@ -155,6 +165,32 @@ private RecyclerView postlv;
 
 
             holder.postOwner.setText(theAnswer.getqOwner().toString());
+
+            String currUsr = "#";
+            currUsr += ParseUser.getCurrentUser().getUsername();
+
+            if(theQuestion.isHasAnswer()){
+                if(position == 1){
+                    holder.answerPicker.setVisibility(View.VISIBLE);
+                }
+            }
+
+            if(currUsr.equals(theQuestion.getqOwner().toString())){
+                if(!theQuestion.isHasAnswer()) {
+                    holder.pickAnswerBtn.setVisibility(View.VISIBLE);
+
+                    holder.pickAnswerBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            createAnswerDialog(position - 1);
+                        }
+                    });
+                }else{
+                    holder.pickAnswerBtn.setVisibility(View.INVISIBLE);
+                }
+
+            }
+
 
 
             holder.postDescription.setText(theAnswer.getqDescription().toString());
@@ -290,12 +326,15 @@ private RecyclerView postlv;
         TextView postTitle;
         TextView postDescription;
         ViewPager intro_images;
+        ImageView answerPicker;
+        Button pickAnswerBtn;
         LinearLayout pager_indicator;
         private int dotsCount;
         private ImageView[] dots;
         private ViewPagerAdapter mViewPagerAdapter;
         private Context contxt;
         private TextView timeago;
+
      private ArrayList<Integer> calcHeights;
 
 
@@ -325,9 +364,12 @@ private RecyclerView postlv;
             postOwner=(TextView) v.findViewById(R.id.postOwner);
             timeago=(TextView) v.findViewById(R.id.timeago);
             postTitle=(TextView) v.findViewById(R.id.postTitle);
+            pickAnswerBtn=(Button) v.findViewById(R.id.pickAnswerBtn);
+            answerPicker=(ImageView) v.findViewById(R.id.theAnsPick);
             postDescription=(TextView) v.findViewById(R.id.postDescription);
             intro_images = (ViewPager) v.findViewById(R.id.pager_introduction);
             pager_indicator = (LinearLayout) v.findViewById(R.id.viewPagerCountDots);
+
             contxt = v.getContext();
 
             calcHeights = new ArrayList<>();
@@ -366,7 +408,7 @@ private RecyclerView postlv;
 
             for (int i = 0; i < dotsCount; i++) {
                 dots[i] = new ImageView(contxt);
-                dots[i].setImageDrawable(contxt.getDrawable(R.drawable.nonselecteditem_dot));
+                dots[i].setImageDrawable(contxt.getResources().getDrawable(R.drawable.nonselecteditem_dot));
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -380,7 +422,7 @@ private RecyclerView postlv;
 
 
             if(dotsCount>0) {
-                dots[0].setImageDrawable(contxt.getDrawable(R.drawable.selecteditem_dot));
+                dots[0].setImageDrawable(contxt.getResources().getDrawable(R.drawable.selecteditem_dot));
             }
         }
 
@@ -394,10 +436,10 @@ private RecyclerView postlv;
         @Override
         public void onPageSelected(int position) {
             for (int i = 0; i < dotsCount; i++) {
-                dots[i].setImageDrawable(contxt.getDrawable(R.drawable.nonselecteditem_dot));
+                dots[i].setImageDrawable(contxt.getResources().getDrawable(R.drawable.nonselecteditem_dot));
             }
 
-            dots[position].setImageDrawable(contxt.getDrawable(R.drawable.selecteditem_dot));
+            dots[position].setImageDrawable(contxt.getResources().getDrawable(R.drawable.selecteditem_dot));
 
 
             if(calcHeights.size()>position) {
@@ -451,6 +493,129 @@ private RecyclerView postlv;
 
         alertMessage.setText(message);
         okayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    public void createAnswerDialog(final int pos){
+        final Dialog dialog = new Dialog(context);
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+
+        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        dialog.setContentView(R.layout.answerdialog);
+
+        final TextView answerMsg = (TextView) dialog.findViewById(R.id.answerMsg);
+        final TextView yesBtn = (TextView) dialog.findViewById(R.id.yesBtnAns);
+        final TextView noBtn = (TextView) dialog.findViewById(R.id.noBtnAns);
+        final ProgressBar prog = (ProgressBar) dialog.findViewById(R.id.progressAns);
+        final ImageView doneImg = (ImageView) dialog.findViewById(R.id.doneImg);
+
+        prog.setVisibility(View.INVISIBLE);
+        doneImg.setVisibility(View.INVISIBLE);
+
+
+
+       yesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                answerMsg.setVisibility(View.INVISIBLE);
+                yesBtn.setVisibility(View.INVISIBLE);
+                noBtn.setVisibility(View.INVISIBLE);
+
+                prog.setVisibility(View.VISIBLE);
+
+                prog.getIndeterminateDrawable().setColorFilter(Color.parseColor("#32BEA6"), PorterDuff.Mode.SRC_IN);
+
+                //Set the chosen answer to number one
+
+                ArrayList<BasicAnswer> answers = theQuestion.getAnswersList();
+
+                BasicAnswer currAns = answers.get(pos);
+                BasicAnswer prevAns  = answers.get(0);
+
+                answers.set(pos,prevAns);
+                answers.set(0,currAns);
+
+                theQuestion.setAnswersList(answers);
+
+
+                final ArrayList<String> ansIds = theQuestion.getAnswersId();
+
+                String currId = ansIds.get(pos);
+                String prevId = ansIds.get(0);
+
+                ansIds.set(pos,prevId);
+                ansIds.set(0,currId);
+
+                theQuestion.setAnswersId(ansIds);
+
+
+                ParseQuery query = new ParseQuery("Questions");
+                query.whereEqualTo("objectId",theQuestion.getPostId());
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(java.util.List<ParseObject> objects, ParseException e) {
+                        if (e == null) {
+                            for (final ParseObject userData : objects) {
+
+                                ArrayList<String> ids = (ArrayList<String>) userData.get("answers");
+
+
+
+
+
+
+                                for(int i=0;i<ansIds.size();i++){
+                                    ids.set(i,ansIds.get(i));
+                                }
+
+
+                                userData.put("answers",ids);
+                                userData.put("hasAnswer",true);
+
+                                            userData.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                    if(e == null){
+                                                        doneImg.setVisibility(View.VISIBLE);
+                                                        prog.setVisibility(View.INVISIBLE);
+                                                        theQuestion.setHasAnswer(true);
+                                                        new Handler().postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                dialog.dismiss();
+                                                                notifyDataSetChanged();
+                                                            }
+                                                        }, 2000);
+
+
+
+                                        }
+                                    }
+                                });
+                            }
+
+                        }
+                    }
+
+                });
+
+
+
+
+            }
+        });
+
+
+
+        noBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
