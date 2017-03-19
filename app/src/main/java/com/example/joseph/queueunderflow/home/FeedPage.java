@@ -139,6 +139,7 @@ public class FeedPage extends Fragment {
                             Date postDate = userData.getCreatedAt();
                             String postId = userData.getObjectId();
                             boolean hasAnswer = userData.getBoolean("hasAnswer");
+                            boolean edited = userData.getBoolean("edited");
                             ArrayList<String> tags = (ArrayList<String>) userData.get("tags");
                             ArrayList<String> answersId = (ArrayList<String>) userData.get("answers");
 
@@ -151,6 +152,7 @@ public class FeedPage extends Fragment {
                                 // Create BasicQuestion with no images
                                 BasicQuestion basicQuestion = new BasicQuestion(owner,title,description,postId,postDate,tags,answersId);
                                 basicQuestion.setHasAnswer(hasAnswer);
+                                basicQuestion.setEdited(edited);
                                 items.add(basicQuestion);
 
                             }else{
@@ -187,6 +189,7 @@ public class FeedPage extends Fragment {
                                 //Create ImageQuestion
                                 ImageQuestion imageQuestion = new ImageQuestion(owner,title,description,postId,postDate,tags,answersId,images);
                                 imageQuestion.setHasAnswer(hasAnswer);
+                                imageQuestion.setEdited(edited);
                                 items.add(imageQuestion);
                             }
 

@@ -158,6 +158,17 @@
             android:text="time"
             android:textSize="10sp" />
 
+        <TextView
+            android:id="@+id/editedText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/postTitle"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@+id/postOption"
+            android:layout_toStartOf="@+id/postOption"
+            android:text="edited"
+            android:visibility="invisible" />
+
 
     </RelativeLayout>
 </LinearLayout>

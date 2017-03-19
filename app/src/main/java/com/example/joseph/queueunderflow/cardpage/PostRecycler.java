@@ -254,6 +254,10 @@ private RecyclerView postlv;
 
             holder.postOwner.setText(theQuestion.getqOwner().toString());
 
+            if(theQuestion.isEdited()){
+                holder.editedText.setVisibility(View.VISIBLE);
+            }
+
 
             title = theQuestion.getqTitle().toString();
             holder.postTitle.setText(title);
@@ -365,6 +369,7 @@ private RecyclerView postlv;
         private ViewPagerAdapter mViewPagerAdapter;
         private Context contxt;
         private TextView timeago;
+        private TextView editedText;
 
      private ArrayList<Integer> calcHeights;
 
@@ -394,6 +399,7 @@ private RecyclerView postlv;
 
             postOwner=(TextView) v.findViewById(R.id.postOwner);
             timeago=(TextView) v.findViewById(R.id.timeago);
+            editedText=(TextView) v.findViewById(R.id.editedText);
             postTitle=(TextView) v.findViewById(R.id.postTitle);
             pickAnswerBtn=(Button) v.findViewById(R.id.pickAnswerBtn);
             answerPicker=(ImageView) v.findViewById(R.id.theAnsPick);

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -34,6 +35,7 @@ import com.example.joseph.queueunderflow.headquarters.skills.Skill;
 import com.example.joseph.queueunderflow.home.BasePage;
 import com.example.joseph.queueunderflow.home.FeedPage;
 import com.example.joseph.queueunderflow.search.SearchPage;
+import com.example.joseph.queueunderflow.submitpost.SubmitQuestion;
 import com.github.curioustechizen.ago.RelativeTimeTextView;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -57,6 +59,10 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
 
 
     private Context context;
+
+    private ProgressBar loadingBar;
+    private ImageView doneLoading;
+    private Dialog loadingDialog;
 
 
     public QuestRecycler(BasePage mainActivity, ArrayList<BasicPost> items) {
@@ -348,12 +354,66 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
         dialog.setContentView(R.layout.optiondialog);
 
         RelativeLayout flagLayout = (RelativeLayout) dialog.findViewById(R.id.flagPost);
+        RelativeLayout subscribeLayout = (RelativeLayout) dialog.findViewById(R.id.subscribePost);
 
         flagLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
                 confirmationAlert(postId);
+            }
+        });
+
+        subscribeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                createLoading();
+                ParseQuery findPost = new ParseQuery("Questions");
+                findPost.whereEqualTo("objectId",postId);
+                findPost.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(java.util.List<ParseObject> objects, ParseException e) {
+
+                        if(e == null){
+                            for(ParseObject userData:objects ){
+
+                                ArrayList<String> subsUsers = (ArrayList<String>) userData.get("subcribedUsers");
+                                subsUsers.add(ParseUser.getCurrentUser().getUsername());
+                                userData.put("subcribedUsers",subsUsers);
+
+                                userData.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if(e == null){
+                                            loadingBar.setVisibility(View.INVISIBLE);
+                                            doneLoading.setVisibility(View.VISIBLE);
+                                            new Handler().postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+
+                                                    loadingDialog.dismiss();
+
+                                                }
+                                            }, 2000);
+
+
+                                        }else {
+                                            createAlert(e.getMessage());
+                                        }
+                                    }
+                                });
+
+
+
+                            }
+
+
+                        }
+
+                    }
+
+                });
             }
         });
 
@@ -371,6 +431,28 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
 
         return skillImgName;
     }
+
+    public void createLoading(){
+        loadingDialog = new Dialog(context);
+        loadingDialog.setCancelable(false);
+        loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        loadingDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        loadingDialog.setContentView(R.layout.postingloading);
+        loadingDialog.setCancelable(false);
+
+        loadingBar = (ProgressBar) loadingDialog.findViewById(R.id.loadingBar);
+
+
+        loadingBar.getIndeterminateDrawable().setColorFilter(Color.parseColor("#32BEA6"), PorterDuff.Mode.SRC_IN);
+
+        doneLoading = (ImageView) loadingDialog.findViewById(R.id.doneLoading);
+
+
+
+
+        loadingDialog.show();
+    }
+
 
 
 }

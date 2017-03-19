@@ -12,6 +12,9 @@ abstract public class BasicPost implements Serializable {
     private String postId;
 
 
+    private boolean edited;
+
+
     private Date postDate;
 
 
@@ -29,6 +32,7 @@ abstract public class BasicPost implements Serializable {
         this.qDescription = qDescription;
         this.postId = postId;
         this.postDate = postDate;
+        this.edited = false;
     }
 
 
@@ -65,6 +69,15 @@ abstract public class BasicPost implements Serializable {
 
     public void setPostDate(Date postDate) {
         this.postDate = postDate;
+    }
+
+
+    public boolean isEdited() {
+        return edited;
+    }
+
+    public void setEdited(boolean edited) {
+        this.edited = edited;
     }
 
 

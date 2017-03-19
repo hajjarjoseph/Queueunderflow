@@ -37,6 +37,8 @@ import com.example.joseph.queueunderflow.home.BasePage;
 import com.example.joseph.queueunderflow.skills.SkillListRecycler;
 import com.example.joseph.queueunderflow.skills.SuggestSkills;
 import com.parse.FindCallback;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -48,7 +50,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -294,6 +299,20 @@ private BasicQuestion question;
                             @Override
                             public void done(ParseException e) {
                                 if(e == null){
+                                    Map<String,Object> params = new HashMap<String,Object>();
+                                    params.put("data","New answers received for a post you subscribed to");
+                                    ArrayList<String> selectedUsers = new ArrayList<String>();
+                                    selectedUsers.add("simonbolivar4");
+                                    params.put("selectedUser",selectedUsers);
+                                    ParseCloud.callFunctionInBackground("notifyNewAnswer", params, new FunctionCallback<Object>() {
+                                        public void done(Object object, ParseException e) {
+                                            if (e == null) {
+                                                createAlert("Done");
+                                            } else {
+                                                createAlert(e.getMessage());
+                                            }
+                                        }
+                                    });
                                     loadingBar.setVisibility(View.INVISIBLE);
                                     doneLoading.setVisibility(View.VISIBLE);
                                     new Handler().postDelayed(new Runnable() {
@@ -336,6 +355,7 @@ private BasicQuestion question;
 
                                         userData.put("title",title);
                                         userData.put("description",description);
+                                        userData.put("edited",true);
 
                                         bindImgs(userData);
 

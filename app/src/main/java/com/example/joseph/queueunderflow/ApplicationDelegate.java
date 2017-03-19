@@ -42,6 +42,8 @@ public class ApplicationDelegate extends Application {
                 .build()
         );
 
+        ParseInstallation.getCurrentInstallation().saveInBackground();
+
 
 
 

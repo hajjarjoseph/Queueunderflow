@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "478619048306",
+    "firebase_url": "https://queueunderflow-162016.firebaseio.com",
+    "project_id": "queueunderflow-162016",
+    "storage_bucket": "queueunderflow-162016.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:478619048306:android:6d0dfeb8673ff2f0",
+        "android_client_info": {
+          "package_name": "com.example.joseph.queueunderflow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "478619048306-3577d1k0g2pusrtqr7tf6d51f665ksue.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_bPQ65wxysZbMLzqcNd9NuWWZ3LqmPLA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
