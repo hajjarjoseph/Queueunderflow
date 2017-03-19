@@ -31,6 +31,9 @@ import com.example.joseph.queueunderflow.headquarters.MainPage;
 import com.example.joseph.queueunderflow.headquarters.QuestionsList;
 import com.example.joseph.queueunderflow.headquarters.queuebuilder.QueueBuilder;
 import com.example.joseph.queueunderflow.headquarters.skills.Skill;
+import com.example.joseph.queueunderflow.home.BasePage;
+import com.example.joseph.queueunderflow.home.FeedPage;
+import com.example.joseph.queueunderflow.search.SearchPage;
 import com.github.curioustechizen.ago.RelativeTimeTextView;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -56,12 +59,18 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
     private Context context;
 
 
-    public QuestRecycler(QuestionsList mainActivity, ArrayList<BasicPost> items) {
+    public QuestRecycler(BasePage mainActivity, ArrayList<BasicPost> items) {
 
         context = mainActivity;
         this.items = items;
 
 
+    }
+
+    public QuestRecycler(SearchPage mainActivity, ArrayList<BasicPost> items) {
+
+        context = mainActivity;
+        this.items = items;
 
     }
 

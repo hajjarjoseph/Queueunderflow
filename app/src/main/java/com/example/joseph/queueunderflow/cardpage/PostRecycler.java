@@ -250,6 +250,12 @@ private RecyclerView postlv;
             holder.postDescription.setText(theQuestion.getqDescription().toString());
 
 
+            holder.options.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    optionAlert(theQuestion.getPostId());
+                }
+            });
 
             if(theQuestion instanceof ImageQuestion){
                 ArrayList<String> urlList = ((ImageQuestion) theQuestion).getImagesUri();
@@ -328,6 +334,7 @@ private RecyclerView postlv;
         ViewPager intro_images;
         ImageView answerPicker;
         Button pickAnswerBtn;
+        ImageView options;
         LinearLayout pager_indicator;
         private int dotsCount;
         private ImageView[] dots;
@@ -366,9 +373,11 @@ private RecyclerView postlv;
             postTitle=(TextView) v.findViewById(R.id.postTitle);
             pickAnswerBtn=(Button) v.findViewById(R.id.pickAnswerBtn);
             answerPicker=(ImageView) v.findViewById(R.id.theAnsPick);
+            options=(ImageView) v.findViewById(R.id.postOption);
             postDescription=(TextView) v.findViewById(R.id.postDescription);
             intro_images = (ViewPager) v.findViewById(R.id.pager_introduction);
             pager_indicator = (LinearLayout) v.findViewById(R.id.viewPagerCountDots);
+
 
             contxt = v.getContext();
 
@@ -632,6 +641,108 @@ private RecyclerView postlv;
 
 
         return skillImgName;
+    }
+
+
+    public void thankYouMessage(){
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        dialog.setContentView(R.layout.thankyoumessage);
+
+        dialog.show();
+    }
+
+    public void optionAlert(final String postId){
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        dialog.setContentView(R.layout.optiondialog);
+
+        RelativeLayout flagLayout = (RelativeLayout) dialog.findViewById(R.id.flagPost);
+
+        flagLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                confirmationAlert(postId);
+            }
+        });
+
+
+        dialog.show();
+    }
+
+    public void confirmationAlert(final String postId){
+        final Dialog dialog = new Dialog(context);
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+
+        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        dialog.setContentView(R.layout.answerdialog);
+
+        final TextView answerMsg = (TextView) dialog.findViewById(R.id.answerMsg);
+        final TextView yesBtn = (TextView) dialog.findViewById(R.id.yesBtnAns);
+        final TextView noBtn = (TextView) dialog.findViewById(R.id.noBtnAns);
+        final ProgressBar prog = (ProgressBar) dialog.findViewById(R.id.progressAns);
+        final ImageView doneImg = (ImageView) dialog.findViewById(R.id.doneImg);
+
+        answerMsg.setText("Are you sure you want to flag this post?");
+
+        prog.setVisibility(View.INVISIBLE);
+        doneImg.setVisibility(View.INVISIBLE);
+
+        yesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                answerMsg.setVisibility(View.INVISIBLE);
+                yesBtn.setVisibility(View.INVISIBLE);
+                noBtn.setVisibility(View.INVISIBLE);
+                prog.setVisibility(View.VISIBLE);
+
+                prog.getIndeterminateDrawable().setColorFilter(Color.parseColor("#32BEA6"), PorterDuff.Mode.SRC_IN);
+
+                ParseQuery query = new ParseQuery("Questions");
+                query.whereEqualTo("objectId",postId);
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(java.util.List<ParseObject> objects, ParseException e) {
+                        if (e == null) {
+                            for (final ParseObject userData : objects) {
+                                userData.put("flagged",true);
+
+                                userData.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if(e == null){
+                                            prog.setVisibility(View.INVISIBLE);
+                                            dialog.dismiss();
+                                            thankYouMessage();
+
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+
+
+            }
+        });
+
+        noBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
     }
 
 

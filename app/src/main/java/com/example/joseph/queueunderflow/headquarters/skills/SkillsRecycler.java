@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.bumptech.glide.DrawableRequestBuilder;
@@ -17,6 +18,8 @@ import com.bumptech.glide.Glide;
 import com.example.joseph.queueunderflow.R;
 import com.example.joseph.queueunderflow.authentication.askquestion.AskQuestionMain;
 import com.example.joseph.queueunderflow.headquarters.MainPage;
+import com.example.joseph.queueunderflow.home.BasePage;
+import com.example.joseph.queueunderflow.skills.SuggestSkills;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -38,15 +41,17 @@ public class SkillsRecycler extends RecyclerView.Adapter<SkillsRecycler.PhotoHol
     private boolean isSelected;
     private boolean fromAsk;
 
+    private int checkIndex;
+
 
     private Context context;
 
 
-    public SkillsRecycler(MainPage mainActivity, ArrayList<Skill> skills,ArrayList<String>skillsPicked) {
+    public SkillsRecycler(SuggestSkills mainActivity, ArrayList<Skill> skills) {
         this.skills = skills;
         context = mainActivity;
-        this.skillsPicked = skillsPicked;
 
+        this.checkIndex = -1;
 
         this.arraylist = new ArrayList<Skill>();
         this.arraylist.addAll(skills);
@@ -59,27 +64,11 @@ public class SkillsRecycler extends RecyclerView.Adapter<SkillsRecycler.PhotoHol
 
     }
 
-    public SkillsRecycler(AskQuestionMain mainActivity, ArrayList<Skill> skills, ArrayList<String>skillsPicked) {
-        this.skills = skills;
-        context = mainActivity;
-        this.skillsPicked = skillsPicked;
-
-        this.arraylist = new ArrayList<Skill>();
-        this.arraylist.addAll(skills);
-
-        if(this.skillsPicked == null){
-            this.skillsPicked = new ArrayList<>();
-        }
-
-        fromAsk = true;
-
-
-    }
 
     @Override
     public SkillsRecycler.PhotoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View inflatedView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.pickskillscell, parent, false);
+                .inflate(R.layout.skillslayout, parent, false);
         return new PhotoHolder(inflatedView);
     }
 
@@ -95,136 +84,30 @@ public class SkillsRecycler extends RecyclerView.Adapter<SkillsRecycler.PhotoHol
 
       holder.bindPhoto(skill);
 
-        if(skill.isSelected()){
-            holder.addBtn.setImageResource(R.drawable.dltico);
-        }else{
-            holder.addBtn.setImageResource(R.drawable.addbtn);
-        }
+
 
         holder.skillName.setText(skill.getName());
 
-        holder.addBtn.setOnClickListener(new View.OnClickListener() {
+        if(checkIndex > -1){
+            if(position == checkIndex){
+                holder.radioBtn.setChecked(true);
+            }else{
+                holder.radioBtn.setChecked(false);
+            }
+        }
+
+        holder.radioBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                 isSelected = skill.isSelected();
-                if(!isSelected){
-                    holder.addBtn.setImageResource(R.drawable.dltico);
-                    isSelected = true;
-                    skill.setSelected(isSelected);
-                    skills.set(position,skill);
-                    skillsPicked.add(skill.getName());
-
-
-
-                    arraylist.clear();
-                    arraylist.addAll(skills);
-
-                    if(fromAsk){
-                        if(skillsPicked.size()>0) {
-                            ((AskQuestionMain) context).setTagFirst(skill.getName(), skill.getSkillUrl());
-                        }
-                    }else{
-
-                        ParseQuery<ParseObject> updateSkills = ParseQuery.getQuery("_User");
-                        updateSkills.whereEqualTo("username", ParseUser.getCurrentUser().getUsername());
-                        updateSkills.findInBackground(new FindCallback<ParseObject>() {
-                            @Override
-                            public void done(List<ParseObject> objects, ParseException e) {
-                                if(e == null){
-                                    for (int i = 0; i < objects.size(); i++) {
-                                        ParseObject object = objects.get(i);
-                                        object.put("skills",skillsPicked);
-                                        object.saveInBackground();
-
-                                    }
-                                }else{
-
-                                    createAlert("Something Went Wrong please try again");
-
-                                    holder.addBtn.setImageResource(R.drawable.addbtn);
-                                    isSelected = false;
-                                    skill.setSelected(isSelected);
-                                    skills.set(position,skill);
-
-                                    arraylist.clear();
-                                    arraylist.addAll(skills);
-
-                                    for(int i=0;i<skillsPicked.size();i++){
-                                        if(skillsPicked.get(i).equals(skill.getName())){
-                                            skillsPicked.remove(i);
-                                        }
-                                    }
-
-
-                                }
-                            }
-                        });
-
-
-                    }
-
-
-
-
-
-
+            public void onClick(View view) {
+                if(holder.radioBtn.isChecked()){
+                    //do nothing
                 }else{
-                    holder.addBtn.setImageResource(R.drawable.addbtn);
-                    isSelected = false;
-                    skill.setSelected(isSelected);
-                    skills.set(position,skill);
-                    arraylist.clear();
-                    arraylist.addAll(skills);
-
-
-                    for(int i=0;i<skillsPicked.size();i++){
-                        if(skillsPicked.get(i).equals(skill.getName())){
-                            skillsPicked.remove(i);
-                        }
-                    }
-
-
-
-                    ParseQuery<ParseObject> updateSkills = ParseQuery.getQuery("_User");
-                    updateSkills.whereEqualTo("username", ParseUser.getCurrentUser().getUsername());
-                    updateSkills.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> objects, ParseException e) {
-                            if(e == null){
-                                for (int i = 0; i < objects.size(); i++) {
-                                    ParseObject object = objects.get(i);
-                                    object.put("skills",skillsPicked);
-                                    object.saveInBackground();
-
-                                }
-                            }else{
-
-                                createAlert("Something Went Wrong please try again");
-
-                                holder.addBtn.setImageResource(R.drawable.dltico);
-                                isSelected = true;
-                                skill.setSelected(isSelected);
-                                skills.set(position,skill);
-                                skillsPicked.add(skill.getName());
-
-                                arraylist.clear();
-                                arraylist.addAll(skills);
-
-
-                            }
-                        }
-                    });
-
-
-
-
+                    holder.radioBtn.setChecked(true);
+                    checkIndex = position;
+                    notifyDataSetChanged();
                 }
-
             }
         });
-
-
-
 
 
 
@@ -245,7 +128,7 @@ public class SkillsRecycler extends RecyclerView.Adapter<SkillsRecycler.PhotoHol
 
         //2
         ImageView skillImage;
-        ImageView addBtn;
+        RadioButton radioBtn;
         TextView skillName;
 
 
@@ -263,7 +146,7 @@ public class SkillsRecycler extends RecyclerView.Adapter<SkillsRecycler.PhotoHol
 
 
             skillImage=(ImageView) v.findViewById(R.id.skillPic);
-            addBtn=(ImageView) v.findViewById(R.id.addBtn);
+            radioBtn=(RadioButton) v.findViewById(R.id.skillPicked);
             skillName=(TextView) v.findViewById(R.id.skillName);
 
 

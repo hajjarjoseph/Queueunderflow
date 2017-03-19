@@ -1,0 +1,21 @@
+<tabs>
+    <tab
+        id="@+id/tab_feed"
+        icon="@drawable/ic_home"
+
+        title="Feed" />
+    <tab
+        id="@+id/tab_search"
+        icon="@drawable/ic_search"
+        title="Search" />
+
+    <tab
+        id="@+id/tab_notifications"
+        icon="@drawable/ic_notifications_none"
+        title="News" />
+    <tab
+        id="@+id/tab_profile"
+        icon="@drawable/ic_account_circle"
+        title="Profile" />
+
+</tabs>

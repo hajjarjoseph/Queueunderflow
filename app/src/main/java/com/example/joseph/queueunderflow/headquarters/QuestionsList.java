@@ -1,27 +1,37 @@
 package com.example.joseph.queueunderflow.headquarters;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
 
 import com.example.joseph.queueunderflow.QuestItem;
 import com.example.joseph.queueunderflow.QuestRecycler;
 import com.example.joseph.queueunderflow.R;
+import com.example.joseph.queueunderflow.authentication.IntroPage;
 import com.example.joseph.queueunderflow.basicpost.BasicPost;
 import com.example.joseph.queueunderflow.basicpost.basicanswer.BasicAnswer;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
 import com.example.joseph.queueunderflow.headquarters.skills.SkillLoader;
+import com.example.joseph.queueunderflow.home.BasePage;
+import com.example.joseph.queueunderflow.search.CustomGridAdapter;
+import com.example.joseph.queueunderflow.search.SearchPage;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.OnTabSelectListener;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,6 +43,11 @@ public class QuestionsList extends AppCompatActivity {
 
     @BindView(R.id.questlv)
     RecyclerView questlv;
+
+
+
+    @BindView(R.id.bottomBar)
+    BottomBar bottomBar;
 
 
     private LinearLayoutManager mLinearLayoutManager;
@@ -48,12 +63,35 @@ public class QuestionsList extends AppCompatActivity {
 
 
 
+
         mLinearLayoutManager = new LinearLayoutManager(this);
         questlv.setLayoutManager(mLinearLayoutManager);
+
+
+
+
+        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
+            @Override
+            public void onTabSelected(@IdRes int tabId) {
+                if (tabId == R.id.tab_search) {
+                    Intent intent = new Intent(QuestionsList.this, SearchPage.class);
+                    startActivity(intent);
+                }
+            }
+        });
+
+
+
+
+
 
         new LoadQuests().execute();
 
 
+    }
+
+    public void tagTap(){
+        new LoadQuests().execute();
     }
 
 
@@ -139,7 +177,7 @@ public class QuestionsList extends AppCompatActivity {
 
                         }
 
-                        mAdapter = new QuestRecycler(QuestionsList.this,items);
+                       // mAdapter = new QuestRecycler((BasePage)getActi,items);
 
                         questlv.setAdapter(mAdapter);
 

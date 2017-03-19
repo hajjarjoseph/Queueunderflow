@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.example.joseph.queueunderflow.authentication.IntroPage;
 import com.example.joseph.queueunderflow.headquarters.MainPage;
 import com.example.joseph.queueunderflow.headquarters.QuestionsList;
+import com.example.joseph.queueunderflow.home.BasePage;
 import com.parse.ParseUser;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, IntroPage.class);
             startActivity(intent);
         }else{
-            Intent intent = new Intent(this, QuestionsList.class);
+            Intent intent = new Intent(this, BasePage.class);
             startActivity(intent);
         }
     }

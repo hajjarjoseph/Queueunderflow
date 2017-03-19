@@ -140,7 +140,7 @@
         </RelativeLayout>
 
         <ImageView
-            android:id="@+id/imageView15"
+            android:id="@+id/postOption"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_alignParentEnd="true"

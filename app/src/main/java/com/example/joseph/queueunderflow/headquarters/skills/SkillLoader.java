@@ -282,11 +282,7 @@ public class SkillLoader {
 
                     }
 
-                    if(fromAsk) {
-                        mAdapter = new SkillsRecycler((AskQuestionMain) mContext, skills, skillsPicked);
-                    }else{
-                        mAdapter = new SkillsRecycler((MainPage) mContext, skills, skillsPicked);
-                    }
+
                     skillslv.setAdapter(mAdapter);
                     skills = new ArrayList<Skill>();
                     dialogSkills.show();
