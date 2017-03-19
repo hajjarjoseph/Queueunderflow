@@ -8,9 +8,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -22,13 +24,23 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.example.joseph.queueunderflow.R;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
+import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
+import com.example.joseph.queueunderflow.cardpage.CardPage;
 import com.example.joseph.queueunderflow.headquarters.QuestionsList;
+import com.example.joseph.queueunderflow.headquarters.skills.Skill;
 import com.example.joseph.queueunderflow.home.BasePage;
+import com.example.joseph.queueunderflow.skills.SkillListRecycler;
+import com.example.joseph.queueunderflow.skills.SuggestSkills;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -36,6 +48,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -88,6 +101,13 @@ private BasicQuestion question;
     ArrayList<Bitmap> bmpList = new ArrayList<>();
 
     private int imgStatus = -1;
+    private BasicQuestion editedPost;
+    private BasicQuestion theQuestion;
+
+    private int fromActivity;
+    // 1 is posting question
+    // 2 is edting post
+    // 3 is posting n answer
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,11 +121,131 @@ private BasicQuestion question;
         bmpList.add(bmp4);
 
         Bundle extras = getIntent().getExtras();
-
+        fromActivity = extras.getInt("fromActivity");
 
         if (extras != null) {
-            tag = extras.getString("skill");
-            // and get whatever type user account id is
+
+            if(fromActivity == 1) {
+                tag = extras.getString("skill");
+            }else if(fromActivity == 2){
+               editedPost =  (BasicQuestion) extras.getSerializable("editPost");
+                titlePick.setText(editedPost.getqTitle());
+                descriptionPick.setText(editedPost.getqDescription());
+                ArrayList<String> urlList = ((ImageQuestion) editedPost).getImagesUri();
+                ArrayList<Uri>uriList = new ArrayList<>();
+                for(int i=0;i<urlList.size();i++){
+                    Uri imageUri = Uri.parse(urlList.get(i).toString());
+                    uriList.add(imageUri);
+                }
+
+                if(editedPost instanceof ImageQuestion){
+                    postBtn.setText("Edit");
+                    imgStatus = ((ImageQuestion)editedPost).getImagesUri().size() - 1;
+                    if(imgStatus == 0){
+                        photoContainer.setVisibility(View.VISIBLE);
+                        Glide.with(this)
+                                .load(uriList.get(0))
+                                .asBitmap()
+                                .into(new SimpleTarget<Bitmap>() {
+                                    @Override
+                                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                        // you can do something with loaded bitmap here
+
+                                        // .....
+
+                                      bmp1 = resource;
+                                        img1.setImageBitmap(bmp1);
+                                    }
+                                });
+                    }else if(imgStatus == 1){
+                        photoContainer.setVisibility(View.VISIBLE);
+                        Glide.with(this)
+                                .load(uriList.get(0))
+                                .asBitmap()
+                                .into(new SimpleTarget<Bitmap>() {
+                                    @Override
+                                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                        // you can do something with loaded bitmap here
+
+                                        // .....
+
+                                        bmp1 = resource;
+                                        img1.setImageBitmap(bmp1);
+                                    }
+                                });
+
+                        Glide.with(this)
+                                .load(uriList.get(1))
+                                .asBitmap()
+                                .into(new SimpleTarget<Bitmap>() {
+                                    @Override
+                                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                        // you can do something with loaded bitmap here
+
+                                        // .....
+
+                                        bmp2 = resource;
+                                        img2.setImageBitmap(bmp2);
+                                    }
+                                });
+                    }else if(imgStatus == 2){
+                        photoContainer.setVisibility(View.VISIBLE);
+                        Glide.with(this)
+                                .load(uriList.get(0))
+                                .asBitmap()
+                                .into(new SimpleTarget<Bitmap>() {
+                                    @Override
+                                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                        // you can do something with loaded bitmap here
+
+                                        // .....
+
+                                        bmp1 = resource;
+                                        img1.setImageBitmap(bmp1);
+                                    }
+                                });
+
+                        Glide.with(this)
+                                .load(uriList.get(1))
+                                .asBitmap()
+                                .into(new SimpleTarget<Bitmap>() {
+                                    @Override
+                                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                        // you can do something with loaded bitmap here
+
+                                        // .....
+
+                                        bmp2 = resource;
+                                        img2.setImageBitmap(bmp2);
+                                    }
+                                });
+
+                        Glide.with(this)
+                                .load(uriList.get(2))
+                                .asBitmap()
+                                .into(new SimpleTarget<Bitmap>() {
+                                    @Override
+                                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                        // you can do something with loaded bitmap here
+
+                                        // .....
+
+                                        bmp3 = resource;
+                                        img3.setImageBitmap(bmp3);
+                                    }
+                                });
+                    }
+
+
+
+                }
+            }else if(fromActivity == 3){
+                theQuestion =  (BasicQuestion) extras.getSerializable("theQuestion");
+                titlePick.setText("Answer for: " + theQuestion.getqTitle());
+                titlePick.setFocusable(false);
+                postBtn.setText("Answer");
+            }
+
         }
 
 
@@ -123,148 +263,192 @@ private BasicQuestion question;
         postBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createLoading();
-               if(titlePick.getText().toString().isEmpty()){
-                   createAlert("Title Field cannot be empty!");
-               }else if(descriptionPick.getText().toString().isEmpty()){
-                   createAlert("Description Field cannot be empty!");
-               }else{
-                   String title = titlePick.getText().toString();
-                   String description = descriptionPick.getText().toString();
-                   ArrayList<String> emptyStr = new ArrayList<String>();
-                   ArrayList<String> skillList = new ArrayList<String>();
-                   skillList.add(tag);
-
-                   ParseObject post = new ParseObject("Questions");
-                   post.put("title",title);
-                   post.put("description",description);
-                   post.put("owner", ParseUser.getCurrentUser().getUsername());
-
-                   post.put("answers",emptyStr);
-                   post.put("hasAnswer",false);
-                   post.put("flagged",false);
-                   post.put("tags",skillList);
-
-                   if(imgStatus > -1){
-                       if(imgStatus == 0){
 
 
-                           ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                           // Compress image to lower quality scale 1 - 100
-                           bmp1.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                           byte[] image = stream.toByteArray();
+                if(fromActivity == 1){
+                    if(titlePick.getText().toString().isEmpty()){
+                        createAlert("Title Field cannot be empty!");
+                    }else if(descriptionPick.getText().toString().isEmpty()){
+                        createAlert("Description Field cannot be empty!");
+                    }else{
+                        createLoading();
+                        String title = titlePick.getText().toString();
+                        String description = descriptionPick.getText().toString();
+                        ArrayList<String> emptyStr = new ArrayList<String>();
+                        ArrayList<String> skillList = new ArrayList<String>();
+                        skillList.add(tag);
 
-                           // Create the ParseFile
-                           ParseFile file = new ParseFile("androidbegin.png", image);
-                           // Upload the image into Parse Cloud
-                           file.saveInBackground();
-                           post.put("image1",file);
+                        ParseObject post = new ParseObject("Questions");
+                        post.put("title",title);
+                        post.put("description",description);
+                        post.put("owner", ParseUser.getCurrentUser().getUsername());
+
+                        post.put("answers",emptyStr);
+                        post.put("hasAnswer",false);
+                        post.put("flagged",false);
+                        post.put("tags",skillList);
+
+                        bindImgs(post);
+
+                        post.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if(e == null){
+                                    loadingBar.setVisibility(View.INVISIBLE);
+                                    doneLoading.setVisibility(View.VISIBLE);
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Intent intent = new Intent(SubmitQuestion.this, BasePage.class);
+                                            startActivity(intent);
+
+                                        }
+                                    }, 2000);
+
+                                }else {
+                                    createAlert(e.getMessage());
+                                }
+                            }
+                        });
+                    }
+
+                }else if(fromActivity == 2){
+                    if(titlePick.getText().toString().isEmpty()){
+                        createAlert("Title Field cannot be empty!");
+                    }else if(descriptionPick.getText().toString().isEmpty()){
+                        createAlert("Description Field cannot be empty!");
+                    }else{
+                        createLoading();
+                        final String title = titlePick.getText().toString();
+                        final String description = descriptionPick.getText().toString();
+                       // ArrayList<String> emptyStr = new ArrayList<String>();
+                        ArrayList<String> skillList = new ArrayList<String>();
+                        skillList.add(tag);
+
+                        ParseQuery findPost = new ParseQuery("Questions");
+                        findPost.whereEqualTo("objectId",editedPost.getPostId());
+                        findPost.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(java.util.List<ParseObject> objects, ParseException e) {
+
+                                if(e == null){
+                                    for(ParseObject userData:objects ){
+
+                                        userData.put("title",title);
+                                        userData.put("description",description);
+
+                                        bindImgs(userData);
+
+                                        userData.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                if(e == null){
+                                                    loadingBar.setVisibility(View.INVISIBLE);
+                                                    doneLoading.setVisibility(View.VISIBLE);
+                                                    new Handler().postDelayed(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            Intent intent = new Intent(SubmitQuestion.this, BasePage.class);
+                                                            startActivity(intent);
+
+                                                        }
+                                                    }, 2000);
+
+                                                }else {
+                                                    createAlert(e.getMessage());
+                                                }
+                                            }
+                                        });
 
 
-                       }else if(imgStatus == 1){
 
-                           ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                           // Compress image to lower quality scale 1 - 100
-                           bmp1.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                           byte[] image = stream.toByteArray();
-
-                           // Create the ParseFile
-                           ParseFile file = new ParseFile("androidbegin.png", image);
-                           // Upload the image into Parse Cloud
-
-                           post.put("image1",file);
+                                    }
 
 
-                           ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
+                                    }
+
+                                }
+
+                            });
 
 
-                           bmp2.compress(Bitmap.CompressFormat.PNG, 100, stream2);
-                           byte[] image2 = stream2.toByteArray();
-
-                           // Create the ParseFile
-                           ParseFile file2 = new ParseFile("parsos.png", image2);
-                           // Upload the image into Parse Cloud
-
-                           file.saveInBackground(new SaveCallback() {
-                               @Override
-                               public void done(ParseException e) {
-                                   if(e == null){
-
-                                   }else{
-                                       createAlert(e.getMessage());
-                                   }
-                               }
-                           });
-
-                           file2.saveInBackground(new SaveCallback() {
-                               @Override
-                               public void done(ParseException e) {
-                                   if(e == null){
-
-                                   }else{
-                                       createAlert(e.getMessage());
-                                   }
-                               }
-                           });
-                           post.put("image2",file2);
-                       }else if(imgStatus == 2){
-                           ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                           // Compress image to lower quality scale 1 - 100
-                           bmp1.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                           byte[] image = stream.toByteArray();
-
-                           // Create the ParseFile
-                           ParseFile file = new ParseFile("androidbegin.png", image);
-                           // Upload the image into Parse Cloud
-                           file.saveInBackground();
-                           post.put("image1",file);
-
-                           ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
-
-                           bmp2.compress(Bitmap.CompressFormat.PNG, 100, stream2);
-                           byte[] image2 = stream2.toByteArray();
-
-                           // Create the ParseFile
-                           ParseFile file2 = new ParseFile("androidbegin2.png", image2);
-                           // Upload the image into Parse Cloud
-                           file2.saveInBackground();
-                           post.put("image2",file2);
+                        }
+                }else if(fromActivity == 3){
+                     if(descriptionPick.getText().toString().isEmpty()){
+                        createAlert("Description Field cannot be empty!");
+                    }else{
+                         createLoading();
+                         final ParseObject newAnswer = new ParseObject("Answers");
+                         newAnswer.put("owner",ParseUser.getCurrentUser().getUsername());
+                         newAnswer.put("Description",descriptionPick.getText().toString());
+                         newAnswer.put("posterid",theQuestion.getPostId());
+                         bindImgs(newAnswer);
 
 
-                           ByteArrayOutputStream stream3 = new ByteArrayOutputStream();
 
-                           bmp3.compress(Bitmap.CompressFormat.PNG, 100, stream3);
-                           byte[] image3 = stream3.toByteArray();
+                         newAnswer.saveInBackground(new SaveCallback() {
+                             @Override
+                             public void done(ParseException e) {
+                                 if(e == null){
+                                     ParseQuery findQuestion = new ParseQuery("Questions");
+                                     findQuestion.whereEqualTo("objectId",theQuestion.getPostId());
+                                     findQuestion.findInBackground(new FindCallback<ParseObject>() {
+                                         @Override
+                                         public void done(java.util.List<ParseObject> objects, ParseException e) {
 
-                           // Create the ParseFile
-                           ParseFile file3 = new ParseFile("androidbegin3.png", image3);
-                           // Upload the image into Parse Cloud
-                           file3.saveInBackground();
-                           post.put("image3",file3);
-                       }
-                   }
+                                             if(e == null){
+                                                 for(ParseObject userData:objects ){
 
-                   post.saveInBackground(new SaveCallback() {
-                       @Override
-                       public void done(ParseException e) {
-                           if(e == null){
-                               loadingBar.setVisibility(View.INVISIBLE);
-                               doneLoading.setVisibility(View.VISIBLE);
-                               new Handler().postDelayed(new Runnable() {
-                                   @Override
-                                   public void run() {
-                                       Intent intent = new Intent(SubmitQuestion.this, BasePage.class);
-                                       startActivity(intent);
+                                                     ArrayList<String> answersList = (ArrayList<String>) userData.get("answers");
+                                                     answersList.add(newAnswer.getObjectId());
+                                                     theQuestion.setAnswersId(answersList);
+                                                     userData.put("answers",answersList);
 
-                                   }
-                               }, 2000);
 
-                           }else {
-                               createAlert(e.getMessage());
-                           }
-                       }
-                   });
-               }
+
+                                                     userData.saveInBackground(new SaveCallback() {
+                                                         @Override
+                                                         public void done(ParseException e) {
+                                                             if(e == null){
+                                                                 loadingBar.setVisibility(View.INVISIBLE);
+                                                                 doneLoading.setVisibility(View.VISIBLE);
+                                                                 new Handler().postDelayed(new Runnable() {
+                                                                     @Override
+                                                                     public void run() {
+                                                                         Intent intent = new Intent(SubmitQuestion.this, CardPage.class);
+                                                                         intent.putExtra("postDetail",theQuestion);
+                                                                         startActivity(intent);
+
+                                                                     }
+                                                                 }, 2000);
+
+                                                             }else {
+                                                                 createAlert(e.getMessage());
+                                                             }
+                                                         }
+                                                     });
+
+
+
+                                                 }
+
+
+                                             }
+
+                                         }
+
+                                     });
+                                 }else{
+                                     createAlert(e.getMessage());
+                                 }
+                             }
+                         });
+
+
+                     }
+                }
+
+
             }
         });
 
@@ -530,5 +714,108 @@ private BasicQuestion question;
         }
 
     }
+
+    public ParseObject bindImgs(ParseObject post){
+        if(imgStatus > -1){
+            if(imgStatus == 0){
+
+
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                // Compress image to lower quality scale 1 - 100
+                bmp1.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] image = stream.toByteArray();
+
+                // Create the ParseFile
+                ParseFile file = new ParseFile("androidbegin.png", image);
+                // Upload the image into Parse Cloud
+                file.saveInBackground();
+                post.put("image1",file);
+
+
+            }else if(imgStatus == 1){
+
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                // Compress image to lower quality scale 1 - 100
+                bmp1.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] image = stream.toByteArray();
+
+                // Create the ParseFile
+                ParseFile file = new ParseFile("androidbegin.png", image);
+                // Upload the image into Parse Cloud
+
+                post.put("image1",file);
+
+
+                ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
+
+
+                bmp2.compress(Bitmap.CompressFormat.PNG, 100, stream2);
+                byte[] image2 = stream2.toByteArray();
+
+                // Create the ParseFile
+                ParseFile file2 = new ParseFile("parsos.png", image2);
+                // Upload the image into Parse Cloud
+
+                file.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if(e == null){
+
+                        }else{
+                            createAlert(e.getMessage());
+                        }
+                    }
+                });
+
+                file2.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if(e == null){
+
+                        }else{
+                            createAlert(e.getMessage());
+                        }
+                    }
+                });
+                post.put("image2",file2);
+            }else if(imgStatus == 2){
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                // Compress image to lower quality scale 1 - 100
+                bmp1.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] image = stream.toByteArray();
+
+                // Create the ParseFile
+                ParseFile file = new ParseFile("androidbegin.png", image);
+                // Upload the image into Parse Cloud
+                file.saveInBackground();
+                post.put("image1",file);
+
+                ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
+
+                bmp2.compress(Bitmap.CompressFormat.PNG, 100, stream2);
+                byte[] image2 = stream2.toByteArray();
+
+                // Create the ParseFile
+                ParseFile file2 = new ParseFile("androidbegin2.png", image2);
+                // Upload the image into Parse Cloud
+                file2.saveInBackground();
+                post.put("image2",file2);
+
+
+                ByteArrayOutputStream stream3 = new ByteArrayOutputStream();
+
+                bmp3.compress(Bitmap.CompressFormat.PNG, 100, stream3);
+                byte[] image3 = stream3.toByteArray();
+
+                // Create the ParseFile
+                ParseFile file3 = new ParseFile("androidbegin3.png", image3);
+                // Upload the image into Parse Cloud
+                file3.saveInBackground();
+                post.put("image3",file3);
+            }
+        }
+        return post;
+    }
+
 
 }

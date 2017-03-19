@@ -262,6 +262,7 @@ public class SuggestSkills extends AppCompatActivity {
                                 Log.d(SuggestSkills.class.getSimpleName(),"okay selected index is " + index);
                                 Intent intent = new Intent(view.getContext(), SubmitQuestion.class);
                                 intent.putExtra("skill",skills.get(index).getName());
+                                intent.putExtra("fromActivity",1);
                                 startActivity(intent);
 
 

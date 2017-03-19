@@ -6,6 +6,7 @@ package com.example.joseph.queueunderflow.cardpage;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
@@ -63,6 +64,7 @@ import com.example.joseph.queueunderflow.headquarters.QuestionsList;
 import com.example.joseph.queueunderflow.headquarters.queuebuilder.QueueBuilder;
 import com.example.joseph.queueunderflow.headquarters.skills.Skill;
 import com.example.joseph.queueunderflow.headquarters.skills.SkillsRecycler;
+import com.example.joseph.queueunderflow.submitpost.SubmitQuestion;
 import com.example.joseph.queueunderflow.viewpager.ViewPagerAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -149,14 +151,16 @@ private RecyclerView postlv;
     @Override
     public void onBindViewHolder(final PostRecycler.PhotoHolder holder, final int position) {
 
-        String title = "";
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        long time = theQuestion.getPostDate().getTime();
-        long now = System.currentTimeMillis();
 
         //It's An answer
         if(getItemViewType(position) == 1){
+
+            String title = "";
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+            long time = theQuestion.getAnswersList().get(position-1).getPostDate().getTime();
+            long now = System.currentTimeMillis();
+
 
             answersList = theQuestion.getAnswersList();
 
@@ -242,6 +246,12 @@ private RecyclerView postlv;
 
 
         }else if(getItemViewType(position) == 0){
+            String title = "";
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+            long time = theQuestion.getPostDate().getTime();
+            long now = System.currentTimeMillis();
+
             holder.postOwner.setText(theQuestion.getqOwner().toString());
 
 
@@ -253,7 +263,21 @@ private RecyclerView postlv;
             holder.options.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    optionAlert(theQuestion.getPostId());
+                    if(position == 0){
+                        if(theQuestion.getqOwner().equals("#" + ParseUser.getCurrentUser().getUsername())){
+                            editAlert(0);
+                        }else{
+                            optionAlert(theQuestion.getPostId());
+                        }
+                    }else if(position > 0){
+                        if(theQuestion.getAnswersList().get(position).getqOwner().equals(ParseUser.getCurrentUser().getUsername())){
+
+                        }else{
+                            optionAlert(theQuestion.getPostId());
+                        }
+                    }
+
+
                 }
             });
 
@@ -673,6 +697,36 @@ private RecyclerView postlv;
 
         dialog.show();
     }
+
+    public void editAlert(final int position){
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        dialog.setContentView(R.layout.editpostdialog);
+
+        RelativeLayout flagLayout = (RelativeLayout) dialog.findViewById(R.id.editPost);
+
+        flagLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                Intent intent = new Intent(context, SubmitQuestion.class);
+
+                if(position == 0) {
+                    intent.putExtra("editPost", theQuestion);
+                    intent.putExtra("fromActivity",2);
+                }
+
+                context.startActivity(intent);
+
+            }
+        });
+
+
+        dialog.show();
+    }
+
 
     public void confirmationAlert(final String postId){
         final Dialog dialog = new Dialog(context);

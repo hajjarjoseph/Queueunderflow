@@ -1,5 +1,6 @@
 package com.example.joseph.queueunderflow.cardpage;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.joseph.queueunderflow.QuestItem;
 import com.example.joseph.queueunderflow.QuestRecycler;
@@ -24,6 +26,7 @@ import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
 import com.example.joseph.queueunderflow.headquarters.QuestionsList;
 import com.example.joseph.queueunderflow.headquarters.skills.SkillLoader;
+import com.example.joseph.queueunderflow.submitpost.SubmitQuestion;
 import com.example.joseph.queueunderflow.viewpager.ViewPagerAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -43,6 +46,8 @@ public class CardPage extends AppCompatActivity  {
     @BindView(R.id.postlv)
     RecyclerView poslv;
 
+    @BindView(R.id.postBtn)
+    TextView postBtn;
 
     private LinearLayoutManager mLinearLayoutManager;
     private PostRecycler mAdapter;
@@ -74,16 +79,33 @@ public class CardPage extends AppCompatActivity  {
 
         if (extras != null) {
             theQuestion = (BasicQuestion) extras.getSerializable("postDetail");
+            theQuestion.setAnswersList(new ArrayList<BasicAnswer>());
         }
+
 
 
         mLinearLayoutManager = new LinearLayoutManager(this);
         poslv.setLayoutManager(mLinearLayoutManager);
 
 
+
         mAdapter = new PostRecycler(CardPage.this,theQuestion,mAdapter);
 
         poslv.setAdapter(mAdapter);
+
+        postBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(CardPage.this, SubmitQuestion.class);
+
+
+                    intent.putExtra("theQuestion", theQuestion);
+                    intent.putExtra("fromActivity",3);
+
+
+                    startActivity(intent);
+            }
+        });
 
         new LoadPost().execute();
 
