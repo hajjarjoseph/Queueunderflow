@@ -43,6 +43,23 @@ public class BasicQuestion extends BasicPost implements Serializable {
 
     }
 
+    public BasicQuestion(String qOwner, String qTitle, String qDescription, String postId, Date postDate,ArrayList<String> voters,ArrayList<String>tags,ArrayList<String>answersId){
+        super(qOwner,qDescription,postId,postDate,voters);
+        this.hasAnswer = false;
+        this.qTitle = qTitle;
+        this.tags = new ArrayList<>();
+        for(int i=0;i<tags.size();i++){
+            this.tags.add(tags.get(i));
+        }
+        this.answersId = new ArrayList<>();
+        for(int i=0;i<answersId.size();i++){
+            this.answersId.add(answersId.get(i));
+        }
+        this.answersList = new ArrayList<>();
+
+
+    }
+
     public ArrayList<String> getTags() {
         return tags;
     }

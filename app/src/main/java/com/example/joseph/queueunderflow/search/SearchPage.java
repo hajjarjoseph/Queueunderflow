@@ -20,6 +20,8 @@ import com.example.joseph.queueunderflow.basicpost.BasicPost;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
 import com.example.joseph.queueunderflow.headquarters.QuestionsList;
+import com.example.joseph.queueunderflow.home.BasePage;
+import com.example.joseph.queueunderflow.home.FeedPage;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -76,7 +78,7 @@ public class SearchPage extends AppCompatActivity {
             @Override
             public void onTabSelected(@IdRes int tabId) {
                 if (tabId == R.id.tab_feed) {
-                    Intent intent = new Intent(SearchPage.this, QuestionsList.class);
+                    Intent intent = new Intent(SearchPage.this, BasePage.class);
                     startActivity(intent);
                 }
             }
@@ -155,8 +157,6 @@ public class SearchPage extends AppCompatActivity {
                     if (e == null) {
                         for (ParseObject userData : objects) {
 
-
-
                             String title = userData.getString("title");
                             String owner = "#";
                             owner += userData.getString("owner");
@@ -164,6 +164,12 @@ public class SearchPage extends AppCompatActivity {
                             Date postDate = userData.getCreatedAt();
                             String postId = userData.getObjectId();
                             boolean hasAnswer = userData.getBoolean("hasAnswer");
+                            boolean edited = userData.getBoolean("edited");
+                            int votes = userData.getInt("Votes");
+                            int upVotes = userData.getInt("upvotes");
+                            int downVotes = userData.getInt("downvotes");
+
+                            ArrayList<String> voters = (ArrayList<String>) userData.get("voters");
                             ArrayList<String> tags = (ArrayList<String>) userData.get("tags");
                             ArrayList<String> answersId = (ArrayList<String>) userData.get("answers");
 
@@ -174,8 +180,10 @@ public class SearchPage extends AppCompatActivity {
                             if(qImage == null){
 
                                 // Create BasicQuestion with no images
-                                BasicQuestion basicQuestion = new BasicQuestion(owner,title,description,postId,postDate,tags,answersId);
+                                BasicQuestion basicQuestion = new BasicQuestion(owner,title,description,postId,postDate,voters,tags,answersId);
                                 basicQuestion.setHasAnswer(hasAnswer);
+                                basicQuestion.setEdited(edited);
+                                basicQuestion.setVotes(upVotes-downVotes);
                                 items.add(basicQuestion);
 
                             }else{
@@ -210,15 +218,12 @@ public class SearchPage extends AppCompatActivity {
                                 }
 
                                 //Create ImageQuestion
-                                ImageQuestion imageQuestion = new ImageQuestion(owner,title,description,postId,postDate,tags,answersId,images);
+                                ImageQuestion imageQuestion = new ImageQuestion(owner,title,description,postId,postDate,tags,answersId,images,voters);
                                 imageQuestion.setHasAnswer(hasAnswer);
+                                imageQuestion.setEdited(edited);
+                                imageQuestion.setVotes(upVotes-downVotes);
                                 items.add(imageQuestion);
                             }
-
-
-
-
-
 
 
                         }
@@ -232,6 +237,9 @@ public class SearchPage extends AppCompatActivity {
                             questlv.setVisibility(View.INVISIBLE);
                             searchPg.setVisibility(View.INVISIBLE);
                         }else if (!srchTxt.isEmpty()){
+                            questlv.setVisibility(View.VISIBLE);
+                            searchPg.setVisibility(View.INVISIBLE);
+                        }else if(fromTag == true){
                             questlv.setVisibility(View.VISIBLE);
                             searchPg.setVisibility(View.INVISIBLE);
                         }

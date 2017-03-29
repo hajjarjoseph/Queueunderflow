@@ -21,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.NoAnimation;
 import com.example.joseph.queueunderflow.authentication.IntroPage;
@@ -34,10 +35,13 @@ import com.example.joseph.queueunderflow.headquarters.queuebuilder.QueueBuilder;
 import com.example.joseph.queueunderflow.headquarters.skills.Skill;
 import com.example.joseph.queueunderflow.home.BasePage;
 import com.example.joseph.queueunderflow.home.FeedPage;
+import com.example.joseph.queueunderflow.reputation.ReputationFactory;
 import com.example.joseph.queueunderflow.search.SearchPage;
 import com.example.joseph.queueunderflow.submitpost.SubmitQuestion;
 import com.github.curioustechizen.ago.RelativeTimeTextView;
 import com.parse.FindCallback;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -46,7 +50,9 @@ import com.parse.SaveCallback;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -63,6 +69,7 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
     private ProgressBar loadingBar;
     private ImageView doneLoading;
     private Dialog loadingDialog;
+    private ReputationFactory reputationGiver;
 
 
     public QuestRecycler(BasePage mainActivity, ArrayList<BasicPost> items) {
@@ -109,6 +116,89 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
             String  skillDraw = nametoDrawable(tag);
 
 
+            final ArrayList<String> theVoters = items.get(position).getVoters();
+
+            boolean alreadyVoted = false;
+            for(int i=0;i<theVoters.size();i++){
+                if(theVoters.get(i).equals(ParseUser.getCurrentUser().getUsername())){
+                    alreadyVoted = true;
+                    break;
+                }
+            }
+
+            if(alreadyVoted){
+                holder.upBtn.setVisibility(View.GONE);
+                holder.downBtn.setVisibility(View.GONE);
+
+            }else {
+                holder.upBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        holder.upBtn.setVisibility(View.GONE);
+                        holder.downBtn.setVisibility(View.GONE);
+                        int totalVotes = items.get(position).getVotes() + 1;
+                        items.get(position).setVotes(totalVotes);
+                        holder.votesNum.setText("" + totalVotes);
+
+
+                        reputationGiver = new ReputationFactory(items.get(position).getqOwner().substring(1),2);
+                        reputationGiver.giveReputation();
+
+                        ParseQuery findPost = new ParseQuery("Questions");
+                        findPost.whereEqualTo("objectId",items.get(position).getPostId());
+                        findPost.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(java.util.List<ParseObject> objects, ParseException e) {
+
+                                if (e == null) {
+                                    for (ParseObject userData : objects) {
+
+
+                                        userData.increment("upvotes");
+                                        userData.increment("Votes");
+                                        userData.add("voters",ParseUser.getCurrentUser().getUsername());
+                                        userData.saveInBackground();
+
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+
+
+                holder.downBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        holder.upBtn.setVisibility(View.GONE);
+                        holder.downBtn.setVisibility(View.GONE);
+                        int totalVotes = items.get(position).getVotes() - 1;
+                         items.get(position).setVotes(totalVotes);
+                        holder.votesNum.setText("" + totalVotes);
+                        ParseQuery findPost = new ParseQuery("Questions");
+                        findPost.whereEqualTo("objectId",items.get(position).getPostId());
+                        findPost.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(java.util.List<ParseObject> objects, ParseException e) {
+
+                                if (e == null) {
+                                    for (ParseObject userData : objects) {
+
+
+                                        userData.increment("downvotes");
+                                        userData.increment("Votes");
+                                        userData.add("voters",ParseUser.getCurrentUser().getUsername());
+                                        userData.saveInBackground();
+
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+
+
+            }
 
             final int imgRess = context.getResources().getIdentifier(skillDraw, null, context.getPackageName());
 
@@ -116,7 +206,10 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
 
             holder.skillPic1.setImageResource(imgRess);
 
+            holder.votesNum.setText("" + items.get(position).getVotes());
             Long times = items.get(position).getPostDate().getTime();
+
+
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -180,10 +273,14 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
         TextView userqItem;
         TextView titleqItem;
         TextView skillName1;
+        TextView votesNum;
         ImageView skillPic1;
+        ImageView upBtn;
+        ImageView downBtn;
         ImageView optionBtn;
         RelativeLayout cardBox;
         TextView timeAgo;
+        RoundCornerProgressBar upPrg;
 
 
 
@@ -204,10 +301,14 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
             userqItem=(TextView) v.findViewById(R.id.userqItem);
             titleqItem=(TextView) v.findViewById(R.id.titleqItem);
             skillName1=(TextView) v.findViewById(R.id.skillNameqItem1);
+            votesNum=(TextView) v.findViewById(R.id.votesNum);
             skillPic1=(ImageView) v.findViewById(R.id.skillPicqItem1);
+            upBtn=(ImageView) v.findViewById(R.id.upBtn);
+            downBtn=(ImageView) v.findViewById(R.id.downBtn);
             optionBtn=(ImageView) v.findViewById(R.id.optionBtn);
             cardBox=(RelativeLayout) v.findViewById(R.id.cardBox);
             timeAgo = (TextView ) v.findViewById(R.id.timestamp);
+            upPrg = (RoundCornerProgressBar ) v.findViewById(R.id.upPrg);
 
 
 
@@ -369,40 +470,69 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
             public void onClick(View view) {
                 dialog.dismiss();
                 createLoading();
-                ParseQuery findPost = new ParseQuery("Questions");
-                findPost.whereEqualTo("objectId",postId);
-                findPost.findInBackground(new FindCallback<ParseObject>() {
+
+                ParseQuery findUser = new ParseQuery("_User");
+                findUser.whereEqualTo("username",ParseUser.getCurrentUser().getUsername());
+                findUser.findInBackground(new FindCallback<ParseObject>() {
                     @Override
                     public void done(java.util.List<ParseObject> objects, ParseException e) {
 
                         if(e == null){
                             for(ParseObject userData:objects ){
 
-                                ArrayList<String> subsUsers = (ArrayList<String>) userData.get("subcribedUsers");
-                                subsUsers.add(ParseUser.getCurrentUser().getUsername());
-                                userData.put("subcribedUsers",subsUsers);
-
+                                userData.add("subscribedPosts",postId);
                                 userData.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
-                                        if(e == null){
-                                            loadingBar.setVisibility(View.INVISIBLE);
-                                            doneLoading.setVisibility(View.VISIBLE);
-                                            new Handler().postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
+                                        ParseQuery findPost = new ParseQuery("Questions");
+                                        findPost.whereEqualTo("objectId",postId);
+                                        findPost.findInBackground(new FindCallback<ParseObject>() {
+                                            @Override
+                                            public void done(java.util.List<ParseObject> objects, ParseException e) {
 
-                                                    loadingDialog.dismiss();
+                                                if(e == null){
+                                                    for(ParseObject userData:objects ){
+
+                                                        ArrayList<String> subsUsers = (ArrayList<String>) userData.get("subcribedUsers");
+                                                        subsUsers.add(ParseUser.getCurrentUser().getUsername());
+                                                        userData.put("subcribedUsers",subsUsers);
+
+                                                        userData.saveInBackground(new SaveCallback() {
+                                                            @Override
+                                                            public void done(ParseException e) {
+                                                                if(e == null){
+                                                                    loadingBar.setVisibility(View.INVISIBLE);
+                                                                    doneLoading.setVisibility(View.VISIBLE);
+                                                                    new Handler().postDelayed(new Runnable() {
+                                                                        @Override
+                                                                        public void run() {
+
+                                                                            loadingDialog.dismiss();
+
+                                                                        }
+                                                                    }, 2000);
+
+
+                                                                }else {
+                                                                    createAlert(e.getMessage());
+                                                                }
+                                                            }
+                                                        });
+
+
+
+                                                    }
+
 
                                                 }
-                                            }, 2000);
 
+                                            }
 
-                                        }else {
-                                            createAlert(e.getMessage());
-                                        }
+                                        });
                                     }
                                 });
+
+
 
 
 
@@ -414,6 +544,8 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
                     }
 
                 });
+
+
             }
         });
 

@@ -236,7 +236,10 @@
         android:ems="10"
         android:gravity="top|left"
         android:inputType="textMultiLine"
-        android:textColorHint="@color/bb_darkBackgroundColor" />
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:textColorHint="@color/bb_darkBackgroundColor"
+        android:textSize="12sp" />
 
 </RelativeLayout>
 

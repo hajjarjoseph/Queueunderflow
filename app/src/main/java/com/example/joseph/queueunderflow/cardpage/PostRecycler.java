@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
+import android.os.Parcelable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
@@ -36,9 +37,11 @@ import com.example.joseph.queueunderflow.basicpost.basicanswer.BasicAnswer;
 import com.example.joseph.queueunderflow.basicpost.basicanswer.imageanswer.ImageAnswer;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
+import com.example.joseph.queueunderflow.comments.CommentsPage;
 import com.example.joseph.queueunderflow.headquarters.QuestionsList;
 import com.example.joseph.queueunderflow.headquarters.skills.Skill;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -64,9 +67,12 @@ import com.example.joseph.queueunderflow.headquarters.QuestionsList;
 import com.example.joseph.queueunderflow.headquarters.queuebuilder.QueueBuilder;
 import com.example.joseph.queueunderflow.headquarters.skills.Skill;
 import com.example.joseph.queueunderflow.headquarters.skills.SkillsRecycler;
+import com.example.joseph.queueunderflow.reputation.ReputationFactory;
 import com.example.joseph.queueunderflow.submitpost.SubmitQuestion;
 import com.example.joseph.queueunderflow.viewpager.ViewPagerAdapter;
 import com.parse.FindCallback;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -76,7 +82,9 @@ import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 import android.os.Handler;
 import java.util.zip.InflaterInputStream;
@@ -91,6 +99,7 @@ public class PostRecycler extends RecyclerView.Adapter<PostRecycler.PhotoHolder>
     private ArrayList<BasicPost> items;
     private BasicQuestion theQuestion;
     private ArrayList<BasicAnswer> answersList;
+    private ReputationFactory reputationGiver;
 
 
 private RecyclerView postlv;
@@ -258,6 +267,16 @@ private RecyclerView postlv;
                 holder.editedText.setVisibility(View.VISIBLE);
             }
 
+            holder.commentBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(context, CommentsPage.class);
+                    intent.putExtra("commentList", (Serializable) theQuestion.getCommentsList());
+                    intent.putExtra("thePostId",theQuestion.getPostId());
+                    context.startActivity(intent);
+                }
+            });
+
 
             title = theQuestion.getqTitle().toString();
             holder.postTitle.setText(title);
@@ -362,6 +381,7 @@ private RecyclerView postlv;
         ViewPager intro_images;
         ImageView answerPicker;
         Button pickAnswerBtn;
+        ImageView commentBtn;
         ImageView options;
         LinearLayout pager_indicator;
         private int dotsCount;
@@ -402,11 +422,13 @@ private RecyclerView postlv;
             editedText=(TextView) v.findViewById(R.id.editedText);
             postTitle=(TextView) v.findViewById(R.id.postTitle);
             pickAnswerBtn=(Button) v.findViewById(R.id.pickAnswerBtn);
+            commentBtn=(ImageView) v.findViewById(R.id.commentBtn);
             answerPicker=(ImageView) v.findViewById(R.id.theAnsPick);
             options=(ImageView) v.findViewById(R.id.postOption);
             postDescription=(TextView) v.findViewById(R.id.postDescription);
             intro_images = (ViewPager) v.findViewById(R.id.pager_introduction);
             pager_indicator = (LinearLayout) v.findViewById(R.id.viewPagerCountDots);
+
 
 
             contxt = v.getContext();
@@ -595,6 +617,9 @@ private RecyclerView postlv;
 
                 theQuestion.setAnswersId(ansIds);
 
+
+                reputationGiver = new ReputationFactory(theQuestion.getAnswersList().get(pos-1).getqOwner().substring(1),5);
+                reputationGiver.giveReputation();
 
                 ParseQuery query = new ParseQuery("Questions");
                 query.whereEqualTo("objectId",theQuestion.getPostId());

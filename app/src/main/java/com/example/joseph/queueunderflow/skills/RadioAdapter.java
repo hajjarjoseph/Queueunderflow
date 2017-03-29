@@ -59,7 +59,7 @@ import java.util.List;
 public abstract class RadioAdapter<T> extends RecyclerView.Adapter<RadioAdapter.ViewHolder> {
     public int mSelectedItem = -1;
     public ArrayList<Skill> skills;
-    private Context mContext;
+    public Context mContext;
 
     public RadioAdapter(Context context, ArrayList<Skill> items) {
         mContext = context;

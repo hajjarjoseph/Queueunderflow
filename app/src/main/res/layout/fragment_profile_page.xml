@@ -1,0 +1,137 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.joseph.queueunderflow.profile.ProfilePage">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout5"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/relativeLayout2">
+
+        <ImageView
+            android:id="@+id/bgpicture"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:scaleType="fitXY" />
+
+        <com.mikhaellopez.circularimageview.CircularImageView
+            android:id="@+id/mypropic"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="60dp"
+            app:srcCompat="@drawable/addbtn" />
+
+        <TextView
+            android:id="@+id/userNameField"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/mypropic"
+            android:layout_alignLeft="@+id/mypropic"
+            android:layout_alignRight="@+id/mypropic"
+            android:layout_alignStart="@+id/mypropic"
+            android:layout_below="@+id/mypropic"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="TextView"
+            android:textColor="#fff"
+            android:textSize="15sp" />
+    </RelativeLayout>
+
+    <TabHost
+        android:id="@+id/tabhost"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/relativeLayout5"
+
+        android:background="@android:color/white">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@layout/profileborder">
+
+                <ImageView
+                    android:id="@+id/imageView8"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    app:srcCompat="@drawable/medal" />
+
+                <TextView
+                    android:id="@+id/repNum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@+id/imageView8"
+                    android:layout_toRightOf="@+id/imageView8"
+                    android:text="0" />
+
+                <ImageView
+                    android:id="@+id/firstPost"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_toEndOf="@+id/repNum"
+                    android:layout_toRightOf="@+id/repNum"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/firstpost" />
+            </RelativeLayout>
+
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+
+            </TabWidget>
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <!-- tab N°1 --> <!-- Inclusion of the interface -->
+                <include
+                    android:id="@+id/i_layout_1"
+                    layout="@layout/layout_myquestions"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+                <!-- tab N°2 --> <!-- Inclusion of the interface -->
+                <include
+                    android:id="@+id/i_layout_2"
+                    layout="@layout/layout_mysubscription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <!-- tab N°3 --> <!-- Inclusion of the interface -->
+
+            </FrameLayout>
+
+        </LinearLayout>
+    </TabHost>
+
+
+</RelativeLayout>

@@ -5,145 +5,162 @@
               xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout
+        android:id="@+id/cardBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@layout/questitemcell"
-        android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:id="@+id/cardBox"
+        android:layout_marginTop="5dp"
+        android:background="@layout/questitemcell"
         android:paddingBottom="10dp"
         android:paddingTop="5dp">
 
         <TextView
+            android:id="@+id/userqItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="#username"
-            android:id="@+id/userqItem"
-            android:textSize="12sp"
-            android:textColor="#334b5f"
-            android:layout_marginLeft="5dp"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"/>
+            android:layout_marginLeft="5dp"
+            android:text="#username"
+            android:textColor="#334b5f"
+            android:textSize="12sp" />
 
         <TextView
+            android:id="@+id/titleqItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Title"
-            android:id="@+id/titleqItem"
-            android:textSize="20sp"
-            android:textColor="#334b5f"
-            android:singleLine="false"
+            android:layout_alignParentEnd="true"
+            android:layout_alignStart="@+id/userqItem"
+            android:layout_below="@+id/timestamp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="10dp"
             android:gravity="center"
-            android:layout_below="@+id/timestamp"
-            android:layout_alignStart="@+id/userqItem"
-            android:layout_alignParentEnd="true"/>
+            android:singleLine="false"
+            android:text="Title"
+            android:textColor="#334b5f"
+            android:textSize="20sp" />
 
 
         <TextView
             android:id="@+id/timestamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="10sp"
-            android:layout_marginLeft="2dp"
-
-            android:layout_below="@+id/userqItem"
             android:layout_alignStart="@+id/userqItem"
-            android:layout_toStartOf="@+id/optionBtn"/>
+            android:layout_below="@+id/userqItem"
+
+            android:layout_marginLeft="2dp"
+            android:layout_toStartOf="@+id/optionBtn"
+            android:textSize="10sp" />
 
         <ImageView
+            android:id="@+id/upBtn"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
-            android:id="@+id/imageView7"
+            android:layout_alignEnd="@+id/downBtn"
+            android:layout_alignStart="@+id/downBtn"
             android:layout_below="@+id/titleqItem"
-            android:src="@drawable/thumbsup"
-            android:background="@layout/upbutton"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
             android:layout_marginTop="20dp"
-            android:layout_alignEnd="@+id/imageView8"
-            android:layout_alignStart="@+id/imageView8"/>
+            android:background="@layout/upbutton"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:src="@drawable/thumbsup" />
 
-        <ImageView
+        <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
+            android:id="@+id/upPrg"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
-            android:id="@+id/imageView8"
-            android:src="@drawable/thumsdown"
-            android:background="@layout/upbutton"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
+            android:layout_alignEnd="@+id/upBtn"
+            android:layout_alignLeft="@+id/upBtn"
+            android:layout_alignRight="@+id/upBtn"
+            android:layout_alignStart="@+id/upBtn"
+            android:layout_alignTop="@+id/upBtn"
+            android:visibility="gone"
+            app:rcBackgroundColor="#ecf0f1"
+            app:rcBackgroundPadding="1dp"
+            app:rcMax="100"
+            app:rcProgress="80"
+            app:rcProgressColor="@color/appMain"
+            app:rcRadius="12dp"
+            app:rcReverse="false"
+            app:rcSecondaryProgress="80"
+            app:rcSecondaryProgressColor="#d3d3d3" />
+
+        <ImageView
+            android:id="@+id/downBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_below="@+id/upBtn"
+            android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
-            android:layout_below="@+id/imageView7"
-            android:layout_centerHorizontal="true"/>
+            android:background="@layout/upbutton"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:src="@drawable/thumsdown" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_below="@+id/imageView8"
-            android:layout_marginTop="10dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentStart="true"
+            android:layout_below="@+id/downBtn"
             android:layout_marginLeft="90dp"
             android:layout_marginRight="90dp"
-            android:background="@layout/timeborder"
-            >
+            android:layout_marginTop="10dp"
+            android:background="@layout/timeborder">
 
             <ImageView
+                android:id="@+id/skillPicqItem1"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:id="@+id/skillPicqItem1"
-                android:layout_marginRight="20dp"
-                android:layout_marginEnd="19dp"
                 android:layout_alignParentTop="true"
-                android:layout_toStartOf="@+id/textView12"
-                android:layout_marginTop="5dp"/>
+                android:layout_marginEnd="19dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_toStartOf="@+id/votesNum" />
 
             <TextView
+                android:id="@+id/skillNameqItem1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Skill"
-                android:id="@+id/skillNameqItem1"
-                android:layout_below="@+id/skillPicqItem1"
                 android:layout_alignEnd="@+id/skillPicqItem1"
                 android:layout_alignStart="@+id/skillPicqItem1"
-                android:textSize="7sp"
+                android:layout_below="@+id/skillPicqItem1"
                 android:gravity="center"
+                android:text="Skill"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#334b5f"
-                />
+                android:textSize="7sp" />
 
             <TextView
+                android:id="@+id/votesNum"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="765"
-                android:id="@+id/textView12"
-                android:textSize="10sp"
-                android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
-                android:textColor="#334b5f"/>
+                android:layout_centerVertical="true"
+                android:text="765"
+                android:textColor="#334b5f"
+                android:textSize="10sp" />
 
             <ImageView
+                android:id="@+id/imageView9"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
-                android:id="@+id/imageView9"
+                android:layout_alignBottom="@+id/votesNum"
                 android:layout_marginLeft="20dp"
-                android:layout_alignBottom="@+id/textView12"
-                android:layout_toEndOf="@+id/textView12"
                 android:layout_marginStart="19dp"
-                android:src="@drawable/share"/>
+                android:layout_toEndOf="@+id/votesNum"
+                android:src="@drawable/share" />
 
 
         </RelativeLayout>
 
         <ImageView
+            android:id="@+id/optionBtn"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:id="@+id/optionBtn"
-            android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/menudots"
-            />
+            android:layout_alignParentTop="true"
+            android:src="@drawable/menudots" />
 
 
     </RelativeLayout>

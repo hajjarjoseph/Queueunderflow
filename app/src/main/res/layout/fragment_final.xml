@@ -9,50 +9,50 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#334b5f">
+        android:background="@color/appMain">
 
         <ImageView
+            android:id="@+id/imageView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imageView4"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/opensign"/>
+            android:src="@drawable/opensign" />
 
         <TextView
+            android:id="@+id/createAccBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Create Account"
-            android:id="@+id/createAccBtn"
-            android:textColor="#ffffff"
-            android:textSize="28sp"
             android:layout_below="@+id/imageView4"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="40dp"/>
+            android:layout_marginTop="40dp"
+            android:text="Create Account"
+            android:textColor="#ffffff"
+            android:textSize="28sp" />
 
         <ProgressBar
+            android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="wrap_content"
             android:layout_height="3dp"
-            android:id="@+id/progressBar"
-            android:layout_below="@+id/createAccBtn"
             android:layout_alignParentEnd="true"
             android:layout_alignParentStart="true"
-            android:progress="100"
-            android:progressTint="#000000"
-            android:layout_marginTop="20dp"
+            android:layout_below="@+id/createAccBtn"
+            android:layout_marginLeft="50dp"
             android:layout_marginRight="50dp"
-            android:layout_marginLeft="50dp"/>
+            android:layout_marginTop="20dp"
+            android:progress="100"
+            android:progressTint="#000000" />
 
         <TextView
+            android:id="@+id/signInBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sign In"
-            android:id="@+id/signInBtn"
             android:layout_below="@+id/progressBar"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
-            android:textSize="28sp"
-            android:textColor="#ffffff"/>
+            android:text="Sign In"
+            android:textColor="#ffffff"
+            android:textSize="28sp" />
     </RelativeLayout>
 </FrameLayout>

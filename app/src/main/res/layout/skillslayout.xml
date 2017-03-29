@@ -6,7 +6,9 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="15dp"
+        android:paddingTop="15dp">
 
         <ImageView
             android:id="@+id/skillPic"
@@ -15,8 +17,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="15dp"
-            app:srcCompat="@drawable/astronomy" />
+            android:layout_marginLeft="15dp" />
 
         <TextView
             android:id="@+id/skillName"

@@ -24,6 +24,7 @@ import com.example.joseph.queueunderflow.MainActivity;
 import com.example.joseph.queueunderflow.R;
 import com.example.joseph.queueunderflow.headquarters.MainPage;
 import com.example.joseph.queueunderflow.headquarters.QuestionsList;
+import com.example.joseph.queueunderflow.home.BasePage;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -90,7 +91,7 @@ public class LogIn extends AppCompatActivity {
                                 // If user exist and authenticated, send user to Welcome.class
                                 Intent intent = new Intent(
                                         LogIn.this,
-                                        QuestionsList.class);
+                                        BasePage.class);
                                 startActivity(intent);
                                 finish();
                             } else {

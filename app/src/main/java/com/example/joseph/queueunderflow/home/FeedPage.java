@@ -1,6 +1,7 @@
 package com.example.joseph.queueunderflow.home;
 
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +11,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.example.joseph.queueunderflow.QuestRecycler;
@@ -17,6 +20,8 @@ import com.example.joseph.queueunderflow.R;
 import com.example.joseph.queueunderflow.basicpost.BasicPost;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
+import com.example.joseph.queueunderflow.comments.Comment;
+import com.example.joseph.queueunderflow.comments.CommentsList;
 import com.example.joseph.queueunderflow.skills.SuggestSkills;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -26,6 +31,8 @@ import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -140,6 +147,30 @@ public class FeedPage extends Fragment {
                             String postId = userData.getObjectId();
                             boolean hasAnswer = userData.getBoolean("hasAnswer");
                             boolean edited = userData.getBoolean("edited");
+                            int votes = userData.getInt("Votes");
+                            int upVotes = userData.getInt("upvotes");
+                            int downVotes = userData.getInt("downvotes");
+
+                           ArrayList<HashMap<String,String>> commentListArr = (ArrayList<HashMap<String,String>>) userData.get("comments");
+                           ArrayList<Comment> theList = new ArrayList<Comment>();
+                            HashMap<String, String> commentList = new HashMap<String, String>();
+                            if(commentListArr.size()>0) {
+
+                               for(int i=0;i<commentListArr.size();i++){
+                                   commentList = commentListArr.get(i);
+                                   Map.Entry<String,String> entry=commentList.entrySet().iterator().next();
+                                   Comment c = new Comment(entry.getKey(),entry.getValue());
+                                   theList.add(c);
+
+                               }
+                            }
+
+                            CommentsList finalCom = new CommentsList(theList);
+
+
+
+
+                            ArrayList<String> voters = (ArrayList<String>) userData.get("voters");
                             ArrayList<String> tags = (ArrayList<String>) userData.get("tags");
                             ArrayList<String> answersId = (ArrayList<String>) userData.get("answers");
 
@@ -150,9 +181,11 @@ public class FeedPage extends Fragment {
                             if(qImage == null){
 
                                 // Create BasicQuestion with no images
-                                BasicQuestion basicQuestion = new BasicQuestion(owner,title,description,postId,postDate,tags,answersId);
+                                BasicQuestion basicQuestion = new BasicQuestion(owner,title,description,postId,postDate,voters,tags,answersId);
                                 basicQuestion.setHasAnswer(hasAnswer);
                                 basicQuestion.setEdited(edited);
+                                basicQuestion.setVotes(upVotes-downVotes);
+                                basicQuestion.setCommentsList(finalCom);
                                 items.add(basicQuestion);
 
                             }else{
@@ -187,9 +220,11 @@ public class FeedPage extends Fragment {
                                 }
 
                                 //Create ImageQuestion
-                                ImageQuestion imageQuestion = new ImageQuestion(owner,title,description,postId,postDate,tags,answersId,images);
+                                ImageQuestion imageQuestion = new ImageQuestion(owner,title,description,postId,postDate,tags,answersId,images,voters);
                                 imageQuestion.setHasAnswer(hasAnswer);
                                 imageQuestion.setEdited(edited);
+                                imageQuestion.setVotes(upVotes-downVotes);
+                                imageQuestion.setCommentsList(finalCom);
                                 items.add(imageQuestion);
                             }
 
@@ -220,6 +255,19 @@ public class FeedPage extends Fragment {
 
 
         }
+    }
+
+    public void firstPost(){
+        Dialog firstPostDialog = new Dialog(this.getContext());
+
+        firstPostDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        firstPostDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        firstPostDialog.setContentView(R.layout.firstpostmessage);
+        firstPostDialog.setCancelable(false);
+
+
+
+        firstPostDialog.show();
     }
 
 

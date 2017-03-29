@@ -9,39 +9,39 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#334b5f">
+        android:background="@color/appMain">
 
         <ImageView
+            android:id="@+id/imageView2"
             android:layout_width="match_parent"
             android:layout_height="320dp"
-            android:id="@+id/imageView2"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/webcoding"/>
+            android:src="@drawable/webcoding" />
 
         <TextView
+            android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ask Questions"
-            android:id="@+id/textView3"
             android:layout_below="@+id/imageView2"
             android:layout_centerHorizontal="true"
-            android:textSize="30sp"
+            android:text="Ask Questions"
             android:textColor="#ffffff"
-            android:textStyle="bold"/>
+            android:textSize="30sp"
+            android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bugs are sometimes difficult to handle, But don&apos;t worry we got your back."
-            android:id="@+id/textView4"
-            android:layout_below="@+id/textView3"
-            android:textColor="#ffffff"
-            android:textSize="20sp"
             android:layout_alignParentEnd="true"
-            android:gravity="center"
-            android:layout_marginTop="20dp"
+            android:layout_below="@+id/textView3"
             android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"/>
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="Bugs are sometimes difficult to handle, But don&apos;t worry we got your back."
+            android:textColor="#ffffff"
+            android:textSize="20sp" />
     </RelativeLayout>
 </FrameLayout>

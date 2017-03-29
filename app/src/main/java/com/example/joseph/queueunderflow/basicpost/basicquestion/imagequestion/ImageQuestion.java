@@ -22,6 +22,14 @@ public class ImageQuestion extends BasicQuestion implements Serializable {
         }
     }
 
+    public ImageQuestion(String qOwner, String qTitle, String qDescription, String postId, Date postDate, ArrayList<String> tags,ArrayList<String> answersId, ArrayList<String>imagesUri,ArrayList<String>voters){
+        super(qOwner,qTitle,qDescription,postId,postDate,voters,tags,answersId);
+        this.imagesUri = new ArrayList<>();
+        for(int i=0;i<imagesUri.size();i++){
+            this.imagesUri.add(imagesUri.get(i));
+        }
+    }
+
     public ArrayList<String> getImagesUri() {
         return imagesUri;
     }

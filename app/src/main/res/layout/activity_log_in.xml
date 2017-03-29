@@ -1,73 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/appMain"
     android:theme="@style/FooBar"
-    tools:context="com.example.joseph.queueunderflow.authentication.LogIn.LogIn"
-    android:background="#334b5f">
+    tools:context="com.example.joseph.queueunderflow.authentication.LogIn.LogIn">
 
     <EditText
+        android:id="@+id/userTF"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/userTF"
         android:layout_above="@+id/passTF"
-        android:layout_marginBottom="30dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
+        android:layout_marginBottom="30dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:textColor="#ffffff"
         android:hint="Username"
-        android:paddingLeft="30dp"/>
+        android:paddingLeft="30dp"
+        android:textColor="#ffffff" />
 
     <EditText
+        android:id="@+id/passTF"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:ems="10"
-        android:id="@+id/passTF"
-        android:textSize="20sp"
-        android:textColor="#ffffff"
-        android:hint="Password"
-        android:paddingLeft="30dp"
-        android:layout_centerVertical="true"
         android:layout_alignEnd="@+id/userTF"
-        android:layout_alignStart="@+id/userTF"/>
+        android:layout_alignStart="@+id/userTF"
+        android:layout_centerVertical="true"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:paddingLeft="30dp"
+        android:textColor="#ffffff"
+        android:textSize="20sp" />
 
     <Button
+        android:id="@+id/loginBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sign In"
-        android:id="@+id/loginBtn"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
-        android:background="#ffffff"
-        android:textColor="#334b5f"
-        android:layout_below="@+id/passTF"
         android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="30dp"/>
+        android:layout_below="@+id/passTF"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="30dp"
+        android:background="#ffffff"
+        android:text="Sign In"
+        android:textColor="#334b5f" />
 
     <TextView
+        android:id="@+id/cancelButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="X"
-        android:id="@+id/cancelButton"
         android:layout_above="@+id/userTF"
         android:layout_alignParentStart="true"
-        android:textColor="#ffffff"
-        android:textSize="30sp"
         android:layout_marginBottom="30dp"
-        android:layout_marginLeft="20dp"/>
+        android:layout_marginLeft="20dp"
+        android:text="X"
+        android:textColor="#ffffff"
+        android:textSize="30sp" />
 
     <ProgressBar
+        android:id="@+id/loginProgress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/loginBtn"
         android:layout_centerHorizontal="true"
-        android:visibility="invisible"
-        android:id="@+id/loginProgress"/>
+        android:visibility="invisible" />
 
 </RelativeLayout>

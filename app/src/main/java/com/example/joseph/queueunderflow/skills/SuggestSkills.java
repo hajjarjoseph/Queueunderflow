@@ -241,6 +241,7 @@ public class SuggestSkills extends AppCompatActivity {
                             String imageUrl = skillImage.getUrl() ;//live url
                             Uri imageUri = Uri.parse(imageUrl);
 
+
                             //Set name and icon
                             skill.setSkillUrl(imageUri);
                             skill.setName(skillName);

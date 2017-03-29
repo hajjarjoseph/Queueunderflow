@@ -34,6 +34,8 @@ import com.example.joseph.queueunderflow.cardpage.CardPage;
 import com.example.joseph.queueunderflow.headquarters.QuestionsList;
 import com.example.joseph.queueunderflow.headquarters.skills.Skill;
 import com.example.joseph.queueunderflow.home.BasePage;
+import com.example.joseph.queueunderflow.home.FeedPage;
+import com.example.joseph.queueunderflow.reputation.ReputationFactory;
 import com.example.joseph.queueunderflow.skills.SkillListRecycler;
 import com.example.joseph.queueunderflow.skills.SuggestSkills;
 import com.parse.FindCallback;
@@ -101,6 +103,9 @@ public class SubmitQuestion extends AppCompatActivity {
     private  ProgressBar loadingBar;
     private  ImageView doneLoading;
 
+    private Dialog firstPostDialog;
+    private boolean firstPost;
+
 private BasicQuestion question;
     Bitmap bmp1,bmp2,bmp3,bmp4;
     ArrayList<Bitmap> bmpList = new ArrayList<>();
@@ -113,6 +118,8 @@ private BasicQuestion question;
     // 1 is posting question
     // 2 is edting post
     // 3 is posting n answer
+
+   private ReputationFactory reputationGiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -292,6 +299,12 @@ private BasicQuestion question;
                         post.put("hasAnswer",false);
                         post.put("flagged",false);
                         post.put("tags",skillList);
+                        post.put("edited",false);
+                        post.put("subcribedUsers",emptyStr);
+                        post.put("Votes",0);
+                        post.put("upvotes",0);
+                        post.put("downvotes",0);
+                        post.put("voters",emptyStr);
 
                         bindImgs(post);
 
@@ -299,20 +312,29 @@ private BasicQuestion question;
                             @Override
                             public void done(ParseException e) {
                                 if(e == null){
-                                    Map<String,Object> params = new HashMap<String,Object>();
-                                    params.put("data","New answers received for a post you subscribed to");
-                                    ArrayList<String> selectedUsers = new ArrayList<String>();
-                                    selectedUsers.add("simonbolivar4");
-                                    params.put("selectedUser",selectedUsers);
-                                    ParseCloud.callFunctionInBackground("notifyNewAnswer", params, new FunctionCallback<Object>() {
-                                        public void done(Object object, ParseException e) {
-                                            if (e == null) {
-                                                createAlert("Done");
-                                            } else {
-                                                createAlert(e.getMessage());
-                                            }
-                                        }
-                                    });
+
+                                    final ParseQuery findUser = new ParseQuery("_User");
+                                    findUser.whereEqualTo("username",ParseUser.getCurrentUser().getUsername());
+                                    findUser.findInBackground(new FindCallback<ParseObject>() {
+                                                                  @Override
+                                                                  public void done(java.util.List<ParseObject> objects, ParseException e) {
+
+                                                                      if (e == null) {
+                                                                          for (ParseObject userData : objects) {
+
+                                                                              firstPost = userData.getBoolean("firstPost");
+                                                                              if(firstPost == false){
+                                                                                  firstPost();
+                                                                                  userData.put("firstPost",true);
+                                                                                  userData.saveInBackground();
+
+                                                                              }
+                                                                          }
+                                                                      }
+                                                                  }
+                                                              });
+
+
                                     loadingBar.setVisibility(View.INVISIBLE);
                                     doneLoading.setVisibility(View.VISIBLE);
                                     new Handler().postDelayed(new Runnable() {
@@ -323,6 +345,8 @@ private BasicQuestion question;
 
                                         }
                                     }, 2000);
+
+
 
                                 }else {
                                     createAlert(e.getMessage());
@@ -420,6 +444,7 @@ private BasicQuestion question;
                                                  for(ParseObject userData:objects ){
 
                                                      ArrayList<String> answersList = (ArrayList<String>) userData.get("answers");
+                                                    final ArrayList<String> subUsers = (ArrayList<String>) userData.get("subcribedUsers");
                                                      answersList.add(newAnswer.getObjectId());
                                                      theQuestion.setAnswersId(answersList);
                                                      userData.put("answers",answersList);
@@ -430,6 +455,72 @@ private BasicQuestion question;
                                                          @Override
                                                          public void done(ParseException e) {
                                                              if(e == null){
+
+
+                                                                 String currUser = ParseUser.getCurrentUser().getUsername();
+
+                                                                 String userMsg = currUser + " has provided a new answer for a question you asked.";
+                                                                String subMsg =  currUser + " has provided a new answer  for a post you subscribed to.";
+
+
+                                                                 Map<String,String> theUserData = new HashMap<String,String>();
+                                                                 theUserData.put(theQuestion.getPostId(),userMsg);
+
+                                                                 Map<String,String> notiData = new HashMap<String,String>();
+                                                                 notiData.put(theQuestion.getPostId(),subMsg);
+
+
+
+                                                                 if(!currUser.equals(theQuestion.getqOwner().substring(1))){
+
+
+                                                                     Map<String,Object> params = new HashMap<String,Object>();
+
+                                                                     params.put("data",userMsg);
+                                                                     params.put("theUser",theQuestion.getqOwner().substring(1));
+                                                                     params.put("theUserData",theUserData);
+                                                                     params.put("notiData",notiData);
+                                                                     ArrayList<String> theUser = new ArrayList<>();
+
+                                                                     theUser.add(theQuestion.getqOwner().substring(1));
+
+                                                                     params.put("selectedUser",theUser);
+                                                                     ParseCloud.callFunctionInBackground("notifyNewAnswer", params, new FunctionCallback<Object>() {
+                                                                         public void done(Object object, ParseException e) {
+                                                                             if (e == null) {
+
+                                                                             } else {
+
+                                                                             }
+                                                                         }
+                                                                     });
+                                                                 }
+
+                                                                 if(subUsers.size() > 0){
+
+                                                                     Map<String,Object> params = new HashMap<String,Object>();
+                                                                     params.put("data",subMsg);
+                                                                     params.put("theUser",theQuestion.getqOwner().substring(1));
+                                                                     params.put("theUserData",theUserData);
+                                                                     params.put("notiData",notiData);
+
+                                                                     params.put("selectedUser",subUsers);
+                                                                     ParseCloud.callFunctionInBackground("notifyNewAnswer", params, new FunctionCallback<Object>() {
+                                                                         public void done(Object object, ParseException e) {
+                                                                             if (e == null) {
+
+                                                                             } else {
+
+                                                                             }
+                                                                         }
+                                                                     });
+
+                                                                 }
+
+                                                                    reputationGiver = new ReputationFactory(ParseUser.getCurrentUser().getUsername(),1);
+                                                                 reputationGiver.giveReputation();
+
+                                                                 
                                                                  loadingBar.setVisibility(View.INVISIBLE);
                                                                  doneLoading.setVisibility(View.VISIBLE);
                                                                  new Handler().postDelayed(new Runnable() {
@@ -516,6 +607,19 @@ private BasicQuestion question;
 
 
         dialog.show();
+    }
+
+    public void firstPost(){
+        firstPostDialog  = new Dialog(this);
+        firstPostDialog.setCancelable(false);
+        firstPostDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        firstPostDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        firstPostDialog.setContentView(R.layout.firstpostmessage);
+        firstPostDialog.setCancelable(false);
+
+
+
+        firstPostDialog.show();
     }
 
     public void createPhotoSelection(){
@@ -742,7 +846,7 @@ private BasicQuestion question;
 
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 // Compress image to lower quality scale 1 - 100
-                bmp1.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                bmp1.compress(Bitmap.CompressFormat.PNG, 10, stream);
                 byte[] image = stream.toByteArray();
 
                 // Create the ParseFile

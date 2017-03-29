@@ -9,42 +9,42 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#334b5f">
+        android:background="@color/appMain">
 
         <ImageView
+            android:id="@+id/imageView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imageView3"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/medal"
-            android:layout_marginTop="30dp"/>
+            android:layout_marginTop="30dp"
+            android:src="@drawable/medal" />
 
         <TextView
+            android:id="@+id/textView5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Gain Reputation"
-            android:id="@+id/textView5"
             android:layout_below="@+id/imageView3"
             android:layout_centerHorizontal="true"
-            android:textSize="30sp"
+            android:layout_marginTop="20dp"
+            android:text="Gain Reputation"
             android:textColor="#ffffff"
-            android:textStyle="bold"
-            android:layout_marginTop="20dp"/>
+            android:textSize="30sp"
+            android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/textView6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enrich the community with your experience. Answer questions and gain reputation."
-            android:id="@+id/textView6"
-            android:layout_below="@+id/textView5"
-            android:textColor="#ffffff"
-            android:textSize="20sp"
-            android:gravity="center"
             android:layout_alignParentEnd="true"
             android:layout_alignParentStart="true"
-            android:layout_marginTop="20dp"
+            android:layout_below="@+id/textView5"
             android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"/>
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="Enrich the community with your experience. Answer questions and gain reputation."
+            android:textColor="#ffffff"
+            android:textSize="20sp" />
     </RelativeLayout>
 </FrameLayout>

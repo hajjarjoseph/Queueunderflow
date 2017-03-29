@@ -119,6 +119,11 @@ public class QuestionsList extends AppCompatActivity {
                             String postId = userData.getObjectId();
                             boolean hasAnswer = userData.getBoolean("hasAnswer");
                             boolean edited = userData.getBoolean("edited");
+                             int votes = userData.getInt("Votes");
+                            int upVotes = userData.getInt("upvotes");
+                            int downVotes = userData.getInt("downVotes");
+
+                            ArrayList<String> voters = (ArrayList<String>) userData.get("voters");
                             ArrayList<String> tags = (ArrayList<String>) userData.get("tags");
                             ArrayList<String> answersId = (ArrayList<String>) userData.get("answers");
 
@@ -129,9 +134,10 @@ public class QuestionsList extends AppCompatActivity {
                             if(qImage == null){
 
                                 // Create BasicQuestion with no images
-                                BasicQuestion basicQuestion = new BasicQuestion(owner,title,description,postId,postDate,tags,answersId);
+                                BasicQuestion basicQuestion = new BasicQuestion(owner,title,description,postId,postDate,tags,answersId,voters);
                                 basicQuestion.setHasAnswer(hasAnswer);
                                 basicQuestion.setEdited(edited);
+                                basicQuestion.setVotes(votes);
                                 items.add(basicQuestion);
 
                             }else{
@@ -166,9 +172,10 @@ public class QuestionsList extends AppCompatActivity {
                                 }
 
                                 //Create ImageQuestion
-                                ImageQuestion imageQuestion = new ImageQuestion(owner,title,description,postId,postDate,tags,answersId,images);
+                                ImageQuestion imageQuestion = new ImageQuestion(owner,title,description,postId,postDate,tags,answersId,images,voters);
                                 imageQuestion.setHasAnswer(hasAnswer);
                                 imageQuestion.setEdited(edited);
+                                imageQuestion.setVotes(votes);
                                 items.add(imageQuestion);
                             }
 

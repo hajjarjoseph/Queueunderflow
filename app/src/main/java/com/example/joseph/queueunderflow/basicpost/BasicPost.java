@@ -1,7 +1,11 @@
 package com.example.joseph.queueunderflow.basicpost;
 
+import com.example.joseph.queueunderflow.comments.CommentsList;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by josep on 2/28/2017.
@@ -11,6 +15,27 @@ abstract public class BasicPost implements Serializable {
     private String qDescription;
     private String postId;
 
+    public CommentsList getCommentsList() {
+        return commentsList;
+    }
+
+    public void setCommentsList(CommentsList commentsList) {
+        this.commentsList = commentsList;
+    }
+
+    private CommentsList commentsList;
+
+
+    private int votes;
+    private int upVotes;
+
+    public int getUpVotes() {
+        return upVotes;
+    }
+
+
+    private int downVotes;
+    private ArrayList<String> voters;
 
     private boolean edited;
 
@@ -33,6 +58,20 @@ abstract public class BasicPost implements Serializable {
         this.postId = postId;
         this.postDate = postDate;
         this.edited = false;
+        this.votes = 0;
+    }
+
+    public BasicPost(String qOwner,String qDescription,String postId,Date postDate,ArrayList<String>voters){
+        this.qOwner = qOwner;
+        this.qDescription = qDescription;
+        this.postId = postId;
+        this.postDate = postDate;
+        this.edited = false;
+        this.votes = 0;
+        this.voters = new ArrayList<>();
+        for(int i=0;i<voters.size();i++){
+            this.voters.add(voters.get(i));
+        }
     }
 
 
@@ -78,6 +117,34 @@ abstract public class BasicPost implements Serializable {
 
     public void setEdited(boolean edited) {
         this.edited = edited;
+    }
+
+    public int getVotes() {
+        return votes;
+    }
+
+    public void setVotes(int votes) {
+        this.votes = votes;
+    }
+
+    public void setUpVotes(int upVotes) {
+        this.upVotes = upVotes;
+    }
+
+    public int getDownVotes() {
+        return downVotes;
+    }
+
+    public void setDownVotes(int downVotes) {
+        this.downVotes = downVotes;
+    }
+
+    public ArrayList<String> getVoters() {
+        return voters;
+    }
+
+    public void setVoters(ArrayList<String> voters) {
+        this.voters = voters;
     }
 
 
