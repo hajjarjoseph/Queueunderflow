@@ -12,11 +12,10 @@
         android:weightSum="3">
 
         <RelativeLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
-            android:layout_weight="1"
             android:background="#ffffff">
 
             <ImageView
@@ -44,73 +43,6 @@
                 android:textSize="12sp" />
         </RelativeLayout>
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_weight="1"
-            android:background="#ffffff">
-
-            <ImageView
-                android:id="@+id/item2Img"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="5dp"
-                android:scaleType="fitXY"
-                app:srcCompat="@drawable/cplus" />
-
-            <TextView
-                android:id="@+id/item2Name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/item2Img"
-                android:layout_alignLeft="@+id/item2Img"
-                android:layout_alignRight="@+id/item2Img"
-                android:layout_alignStart="@+id/item2Img"
-                android:layout_below="@+id/item2Img"
-                android:layout_marginTop="3dp"
-                android:gravity="center"
-                android:text="TextView"
-                android:textSize="12sp" />
-        </RelativeLayout>
-
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_weight="1"
-            android:background="#ffffff">
-
-            <ImageView
-                android:id="@+id/item3Img"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="5dp"
-                android:scaleType="fitXY"
-                app:srcCompat="@drawable/cplus" />
-
-            <TextView
-                android:id="@+id/item3Name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/item3Img"
-                android:layout_alignLeft="@+id/item3Img"
-                android:layout_alignRight="@+id/item3Img"
-                android:layout_alignStart="@+id/item3Img"
-                android:layout_below="@+id/item3Img"
-                android:layout_marginTop="3dp"
-                android:gravity="center"
-                android:text="TextView"
-                android:textSize="12sp" />
-        </RelativeLayout>
 
     </LinearLayout>
 

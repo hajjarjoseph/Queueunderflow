@@ -21,6 +21,7 @@ import com.example.joseph.queueunderflow.notifications.NotificationPage;
 import com.example.joseph.queueunderflow.notifications.NotificationsList;
 import com.example.joseph.queueunderflow.notifications.NotificationsRecycler;
 import com.example.joseph.queueunderflow.profile.ProfilePage;
+import com.example.joseph.queueunderflow.search.SearchFragment;
 import com.example.joseph.queueunderflow.search.SearchPage;
 import com.example.joseph.queueunderflow.utils.FragmentChangeListener;
 import com.parse.FindCallback;
@@ -101,14 +102,16 @@ public class BasePage extends AppCompatActivity implements
             @Override
             public void onTabSelected(@IdRes int tabId) {
                 if (tabId == R.id.tab_search) {
-                    Intent intent = new Intent(BasePage.this, SearchPage.class);
-                    startActivity(intent);
+                    final  FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    SearchFragment newSearch = new SearchFragment();
+                    ft.replace(R.id.containerFrag, newSearch);
+                    ft.commit();
                 }else if(tabId == R.id.tab_profile){
                     final  FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     ProfilePage newProfile = new ProfilePage();
                     ft.replace(R.id.containerFrag, newProfile);
                     ft.commit();
-                }else if(tabId == R.id.tab_feed){
+                } else if(tabId == R.id.tab_feed){
                     final  FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     FeedPage newFeed = new FeedPage();
                     ft.replace(R.id.containerFrag, newFeed );

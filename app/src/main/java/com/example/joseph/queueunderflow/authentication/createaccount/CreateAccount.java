@@ -14,11 +14,24 @@ import android.widget.TextView;
 import com.example.joseph.queueunderflow.MainActivity;
 import com.example.joseph.queueunderflow.R;
 import com.example.joseph.queueunderflow.headquarters.MainPage;
+import com.example.joseph.queueunderflow.home.BasePage;
+import com.example.joseph.queueunderflow.selectiontopic.SelectTopicPage;
+import com.parse.FindCallback;
+import com.parse.FunctionCallback;
+import com.parse.Parse;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,7 +48,7 @@ public class CreateAccount extends AppCompatActivity {
     EditText passwordTF;
 
     @BindView(R.id.signUpBtn)
-    TextView signUpBtn;
+    Button signUpBtn;
 
     private Dialog signDialog;
 
@@ -62,9 +75,9 @@ public class CreateAccount extends AppCompatActivity {
 
 
                 signAlert();
-                String fullNameText = nameTF.getText().toString();
+                final String fullNameText = nameTF.getText().toString();
                 final String usernameText = usernameTF.getText().toString();
-                String emailText = emailTF.getText().toString();
+                final String emailText = emailTF.getText().toString();
                 String password = passwordTF.getText().toString();
 
 
@@ -91,7 +104,7 @@ public class CreateAccount extends AppCompatActivity {
                     createAlert("Password length must be at least 8 characters long.");
 
                 }else{
-                    ParseUser user = new ParseUser();
+                    final ParseUser user = new ParseUser();
                     user.setUsername(usernameText);
                     user.setPassword(password);
                     user.setEmail(emailText);
@@ -99,7 +112,13 @@ public class CreateAccount extends AppCompatActivity {
 
                     ArrayList<String> emptyArr = new ArrayList<String>();
                     user.put("FullName",fullNameText);
+                    user.put("firstPost",false);
+                    user.put("Reputation",0);
+
                     user.put("skills",emptyArr);
+                    user.put("subscribedPosts",emptyArr);
+                    user.put("notifications",emptyArr);
+
 
 
                     user.signUpInBackground(new SignUpCallback() {
@@ -107,7 +126,77 @@ public class CreateAccount extends AppCompatActivity {
                         public void done(ParseException e) {
 
                             if(e==null){
-                                Intent intent = new Intent(mContext, MainPage.class);
+
+
+
+
+                                ParseInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        Map<String,Object> params = new HashMap<String,Object>();
+                                        String deviceToken = (String) ParseInstallation.getCurrentInstallation().get("deviceToken");
+                                        params.put("deviceTok", deviceToken);
+                                        params.put("theUser",usernameText);
+
+                                        ParseCloud.callFunctionInBackground("setUserInstall", params, new FunctionCallback<Object>() {
+                                            public void done(Object object, ParseException e) {
+                                                if (e == null) {
+
+                                                } else {
+
+                                                }
+                                            }
+                                        });
+
+                                        Map<String,Object> paramsMail = new HashMap<String,Object>();
+
+                                        String userName = "";
+
+                                        if(fullNameText.contains(" ")){
+                                            userName= fullNameText.substring(0, fullNameText.indexOf(" "));
+
+                                        }else{
+                                            userName = fullNameText;
+                                        }
+
+
+                                        paramsMail.put("myEmail", emailText);
+                                        paramsMail.put("userName", userName);
+
+
+                                        ParseCloud.callFunctionInBackground("sendWelcomeMail", paramsMail, new FunctionCallback<Object>() {
+                                            public void done(Object object, ParseException e) {
+                                                if (e == null) {
+
+                                                } else {
+
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+
+
+
+
+                                ParseQuery incrementUsrers = new ParseQuery("Numbers");
+                                incrementUsrers.whereEqualTo("objectId","AI9X0DPPfe");
+                                incrementUsrers.findInBackground(new FindCallback<ParseObject>() {
+                                                                     @Override
+                                                                     public void done(java.util.List<ParseObject> objects, ParseException e) {
+                                                                         if (e == null) {
+                                                                             for (ParseObject userData : objects) {
+
+                                                                                 userData.increment("usersNum");
+                                                                                 userData.saveInBackground();
+
+
+
+                                                                             }
+                                                                         }
+                                                                     }
+                                                                 });
+                                Intent intent = new Intent(mContext, SelectTopicPage.class);
                                 intent.putExtra("firstTime",true);
                                 signDialog.dismiss();
                                 startActivity(intent);
@@ -151,6 +240,8 @@ public class CreateAccount extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
+
+
         dialog.show();
     }
 

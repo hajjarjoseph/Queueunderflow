@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -49,183 +50,77 @@ import java.util.TimeZone;
 /**
  * Created by josep on 2/19/2017.
  */
-public class CustomGridAdapter extends RecyclerView.Adapter<CustomGridAdapter.PhotoHolder> {
+public class CustomGridAdapter extends BaseAdapter {
+    private Context mContext;
+    LayoutInflater layoutInflater;
+    private ArrayList<Skill>skillsList;
 
-    private ArrayList<BasicPost> items;
-
-
-
-    private Context context;
-
-
-    public CustomGridAdapter(SearchPage mainActivity) {
-
-        context = mainActivity;
-
+    // Gets the context so it can be used later
+    public CustomGridAdapter(Context c) {
+        mContext = c;
+        skillsList = new ArrayList<>();
     }
 
-
-    @Override
-    public CustomGridAdapter.PhotoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View inflatedView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.tagsgrid, parent, false);
-        return new PhotoHolder(inflatedView);
+    public CustomGridAdapter(Context c,ArrayList<Skill>skillsList) {
+        mContext = c;
+        this.skillsList = skillsList;
     }
 
-    @Override
-    public void onBindViewHolder(final CustomGridAdapter.PhotoHolder holder, final int position) {
-
-
-
-
-        if(position == 0){
-            holder.item1Name.setText("Math");
-            holder.item1Img.setImageResource(R.drawable.mathico);
-
-            holder.item2Name.setText("Physics");
-            holder.item2Img.setImageResource(R.drawable.physicsico);
-
-            holder.item3Name.setText("Writing");
-            holder.item3Img.setImageResource(R.drawable.writing);
-
-
-        }else if(position == 2){
-            holder.item1Name.setText("Biology");
-            holder.item1Img.setImageResource(R.drawable.biologyico);
-
-            holder.item2Name.setText("C++");
-
-            holder.item3Name.setText("Chemistry");
-            holder.item3Img.setImageResource(R.drawable.chemistryico);
-
-
-        }else if(position == 1){
-            holder.item1Name.setText("Java");
-            holder.item1Img.setImageResource(R.drawable.java);
-
-
-            holder.item1Img.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    Log.d(CustomGridAdapter.class.getSimpleName(),"okay nehna jouwa");
-                    ((SearchPage)context).tagPress(holder.item1Name.getText().toString());
-
-
-                }
-            });
-
-
-            holder.item2Name.setText("Space");
-            holder.item2Img.setImageResource(R.drawable.astronomy);
-
-
-            holder.item3Name.setText("Cars");
-            holder.item3Img.setImageResource(R.drawable.cars);
-
-
-
-
-
-
-        }
-
-
-
-
-
-
+    // Total number of things contained within the adapter
+    public int getCount() {
+        return skillsList.size();
     }
 
-
-
-
-    @Override
-    public int getItemCount() {
-
-        return 3;
+    // Require for structure, not really used in my code.
+    public Object getItem(int position) {
+        return null;
     }
 
-    public static class PhotoHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-
-
-
-        //2
-        TextView item1Name,item2Name,item3Name;
-        ImageView item1Img,item2Img,item3Img;
-
-
-
-
-
-
-
-
-
-        //3
-        private static final String PHOTO_KEY = "PHOTO";
-
-        //4
-        public PhotoHolder(View v) {
-            super(v);
-
-
-
-
-
-            item1Name=(TextView) v.findViewById(R.id.item1Name);
-            item1Img=(ImageView) v.findViewById(R.id.item1Img);
-
-            item2Name=(TextView) v.findViewById(R.id.item2Name);
-            item2Img=(ImageView) v.findViewById(R.id.item2Img);
-
-            item3Name=(TextView) v.findViewById(R.id.item3Name);
-            item3Img=(ImageView) v.findViewById(R.id.item3Img);
-
-            v.setOnClickListener(this);
-
-
-
-
-
-
-
-
-
-        }
-
-        //click method
-        @Override
-        public void onClick(View v) {
-
-
-
-        }
-
-
-        public void bindPhoto(Skill skill) {
-
-            final Uri imageUri = skill.getSkillUrl();
-
-
-
-
-
-
-
-        }
-
-
-
-
-
+    // Require for structure, not really used in my code. Can
+    // be used to get the id of an item in the adapter for
+    // manual control.
+    public long getItemId(int position) {
+        return position;
     }
+
+    public View getView(int position,
+                        View convertView, ViewGroup parent) {
+        TextView item1Name = null;
+        ImageView item1Img = null;
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            convertView= inflater.inflate(R.layout.tagsgrid, parent, false);
+            item1Name=(TextView) convertView.findViewById(R.id.item1Name);
+            item1Img=(ImageView) convertView.findViewById(R.id.item1Img);
+
+
+
+            if(skillsList.size()>0){
+                Skill skill = skillsList.get(position);
+                item1Name.setText(skill.getName());
+                Glide.with(mContext).load(skill.getSkillUrl()).into(item1Img);
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        return convertView;
+    }
+
 
 
 
     public void confirmationAlert(final String postId){
-        final Dialog dialog = new Dialog(context);
+        final Dialog dialog = new Dialog(mContext);
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -297,7 +192,7 @@ public class CustomGridAdapter extends RecyclerView.Adapter<CustomGridAdapter.Ph
 
 
     public void createAlert(String message){
-        final Dialog dialog = new Dialog(context);
+        final Dialog dialog = new Dialog(mContext);
         dialog.setContentView(R.layout.customdialog);
 
         TextView alertMessage = (TextView) dialog.findViewById(R.id.alertMessage);
@@ -314,7 +209,7 @@ public class CustomGridAdapter extends RecyclerView.Adapter<CustomGridAdapter.Ph
     }
 
     public void thankYouMessage(){
-        final Dialog dialog = new Dialog(context);
+        final Dialog dialog = new Dialog(mContext);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         dialog.setContentView(R.layout.thankyoumessage);
@@ -323,7 +218,7 @@ public class CustomGridAdapter extends RecyclerView.Adapter<CustomGridAdapter.Ph
     }
 
     public void optionAlert(final String postId){
-        final Dialog dialog = new Dialog(context);
+        final Dialog dialog = new Dialog(mContext);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -356,3 +251,7 @@ public class CustomGridAdapter extends RecyclerView.Adapter<CustomGridAdapter.Ph
 
 
 }
+
+
+
+

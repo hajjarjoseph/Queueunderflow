@@ -13,6 +13,7 @@ public class Skill {
 
    public void  skill(){
         this.name = "";
+       this.isSelected = false;
 
     }
 

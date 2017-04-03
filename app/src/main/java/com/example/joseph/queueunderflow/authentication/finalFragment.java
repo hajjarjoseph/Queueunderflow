@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.example.joseph.queueunderflow.authentication.LogIn.LogIn;
 import com.example.joseph.queueunderflow.authentication.createaccount.CreateAccount;
 import com.example.joseph.queueunderflow.R;
+import com.example.joseph.queueunderflow.reset.ResetPage;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +22,7 @@ public class finalFragment extends Fragment {
 
     private TextView createAccBtn;
     private TextView signInBtn;
+    private TextView resetPass;
 
     public finalFragment() {
         // Required empty public constructor
@@ -36,6 +38,7 @@ public class finalFragment extends Fragment {
 
         createAccBtn = (TextView) view.findViewById(R.id.createAccBtn);
         signInBtn = (TextView) view.findViewById(R.id.signInBtn);
+        resetPass = (TextView) view.findViewById(R.id.forgotPassBtn);
 
         createAccBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,6 +48,8 @@ public class finalFragment extends Fragment {
             }
         });
 
+
+
         signInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,6 +57,19 @@ public class finalFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+
+
+        resetPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), ResetPage.class);
+                startActivity(intent);
+            }
+        });
+
+
+
 
 
 

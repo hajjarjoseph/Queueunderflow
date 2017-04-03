@@ -73,17 +73,19 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
 
-                <!--                 IMPORTANT: Change "com.parse.starter" to match your app's package name. -->
+                <!-- IMPORTANT: Change "com.parse.starter" to match your app's package name. -->
                 <category android:name="com.example.joseph.queueunderflow" />
             </intent-filter>
         </receiver>
 
-        <!--         IMPORTANT: Change "YOUR_SENDER_ID" to your GCM Sender Id. -->
+        <!-- IMPORTANT: Change "YOUR_SENDER_ID" to your GCM Sender Id. -->
         <meta-data
             android:name="com.parse.push.gcm_sender_id"
             android:value="id:478619048306" />
         ;
-        <activity android:name=".comments.CommentsPage"></activity>
+        <activity android:name=".comments.CommentsPage" />
+        <activity android:name=".reset.ResetPage" />
+        <activity android:name=".selectiontopic.SelectTopicPage"></activity>
     </application>
 
 </manifest>

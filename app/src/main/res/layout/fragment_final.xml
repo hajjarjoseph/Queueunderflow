@@ -54,5 +54,20 @@
             android:text="Sign In"
             android:textColor="#ffffff"
             android:textSize="28sp" />
+
+        <TextView
+            android:id="@+id/forgotPassBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/signInBtn"
+            android:layout_marginTop="50dp"
+            android:gravity="center_horizontal"
+            android:text="Forgot your password?"
+            android:textColor="#fff"
+            android:textSize="16sp" />
     </RelativeLayout>
 </FrameLayout>

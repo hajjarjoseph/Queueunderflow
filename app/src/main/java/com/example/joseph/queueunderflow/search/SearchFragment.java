@@ -1,17 +1,22 @@
 package com.example.joseph.queueunderflow.search;
 
+
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.annotation.IdRes;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ListAdapter;
 import android.widget.ProgressBar;
 
 import com.example.joseph.queueunderflow.QuestRecycler;
@@ -19,75 +24,89 @@ import com.example.joseph.queueunderflow.R;
 import com.example.joseph.queueunderflow.basicpost.BasicPost;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
-import com.example.joseph.queueunderflow.headquarters.QuestionsList;
+import com.example.joseph.queueunderflow.comments.Comment;
+import com.example.joseph.queueunderflow.comments.CommentsList;
+import com.example.joseph.queueunderflow.headquarters.skills.Skill;
 import com.example.joseph.queueunderflow.home.BasePage;
-import com.example.joseph.queueunderflow.home.FeedPage;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SearchPage extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class SearchFragment extends Fragment {
+
+    SearchFragment context;
 
     @BindView(R.id.tagslv)
-    RecyclerView tagsgv;
+    GridView tagsgv;
     @BindView(R.id.searchQuest)
     EditText searchQuest;
     @BindView(R.id.questlvSearch)
     RecyclerView questlv;
-    @BindView(R.id.bottomBar)
-    BottomBar bottomBar;
+
     @BindView(R.id.searchPg)
     ProgressBar searchPg;
 
 
     private ArrayList<BasicPost> items = new ArrayList<>();
     private QuestRecycler mAdapter;
+    private CustomGridAdapter mGridAdapter;
     private String srchTxt="";
     private boolean fromTag = false;
     private String tagName = "";
+    private ArrayList<Skill> skillsList;
+
+    public SearchFragment() {
+        // Required empty public constructor
+    }
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_page);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_search, container, false);
+        ButterKnife.bind(this, view);
 
-        ButterKnife.bind(this);
 
-        LinearLayoutManager layoutManager= new LinearLayoutManager(this,LinearLayoutManager.VERTICAL, false);
-        LinearLayoutManager secondlayoutManager= new LinearLayoutManager(this,LinearLayoutManager.VERTICAL, false);
 
-        tagsgv.setLayoutManager(layoutManager);
+
+
+        context = this;
+
+        new LoadTopics().execute();
+
+        LinearLayoutManager layoutManager= new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager secondlayoutManager= new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL, false);
+
+
         questlv.setLayoutManager(secondlayoutManager);
 
         questlv.setVisibility(View.INVISIBLE);
         searchPg.setVisibility(View.INVISIBLE);
 
-        bottomBar.selectTabAtPosition(1);
-
-        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
-            @Override
-            public void onTabSelected(@IdRes int tabId) {
-                if (tabId == R.id.tab_feed) {
-                    Intent intent = new Intent(SearchPage.this, BasePage.class);
-                    startActivity(intent);
-                }
-            }
-        });
 
 
-        CustomGridAdapter mAdapter = new CustomGridAdapter(SearchPage.this);
+
+        CustomGridAdapter mAdapter = new CustomGridAdapter(this.getContext());
 
 
+        tagsgv.setAdapter((ListAdapter) mAdapter);
 
 
 
@@ -101,7 +120,7 @@ public class SearchPage extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 searchPg.setVisibility(View.VISIBLE);
                 fromTag = false;
-              srchTxt = searchQuest.getText().toString();
+                srchTxt = searchQuest.getText().toString();
                 if(srchTxt.equals("")){
                     tagsgv.setVisibility(View.VISIBLE);
                     questlv.setVisibility(View.INVISIBLE);
@@ -126,7 +145,10 @@ public class SearchPage extends AppCompatActivity {
         });
 
 
+
+        return view;
     }
+
 
     public void tagPress(String name){
         searchPg.setVisibility(View.VISIBLE);
@@ -228,7 +250,7 @@ public class SearchPage extends AppCompatActivity {
 
                         }
 
-                        mAdapter = new QuestRecycler(SearchPage.this,items);
+                        mAdapter = new QuestRecycler( getContext(),items);
 
 
                         questlv.setAdapter(mAdapter);
@@ -264,4 +286,63 @@ public class SearchPage extends AppCompatActivity {
 
         }
     }
+
+
+    private class LoadTopics extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            skillsList = new ArrayList<>();
+
+            ParseQuery fetchQuests = new ParseQuery("Skills");
+            fetchQuests.orderByDescending("createdAt");
+            fetchQuests.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(java.util.List<ParseObject> objects, ParseException e) {
+                    if (e == null) {
+                        for (ParseObject userData : objects) {
+
+                            Skill skill = new Skill();
+
+                            String name = userData.getString("name");
+
+
+
+
+                            ParseFile qImage = (ParseFile) userData.get("icon");
+
+                            String imageUrl = qImage.getUrl() ;//live url
+                            Uri imageUri = Uri.parse(imageUrl);
+
+                            skill.setName(name);
+                            skill.setSkillUrl(imageUri);
+
+                            skillsList.add(skill);
+
+
+
+
+                        }
+
+                        mGridAdapter = new CustomGridAdapter(getContext(),skillsList);
+
+                        tagsgv.setAdapter(mGridAdapter);
+
+                    }
+                }
+
+            });
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // Locate the listview in listview_main.xml
+
+
+        }
+    }
+
 }

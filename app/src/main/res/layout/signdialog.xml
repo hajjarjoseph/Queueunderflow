@@ -1,33 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="120dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:layout_gravity="center_vertical">
 
         <ProgressBar
+            android:id="@+id/progressBar2"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:id="@+id/progressBar2"
-            android:progress="100"
-            android:progressTint="#334b5f"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginTop="5dp"
+            android:backgroundTint="@color/appMain"
+            android:progress="100"
+            android:progressTint="@color/appMain" />
 
         <TextView
+            android:id="@+id/textView10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Preparing your account !"
-            android:id="@+id/textView10"
             android:layout_below="@+id/progressBar2"
             android:layout_centerHorizontal="true"
-            android:textColor="#334b5f"
-            android:textSize="18sp"
             android:layout_marginTop="15dp"
-            android:textStyle="italic"/>
+            android:text="Preparing your account !"
+            android:textColor="#000"
+            android:textSize="18sp"
+            android:textStyle="italic" />
     </RelativeLayout>
-</LinearLayout>
+</RelativeLayout>

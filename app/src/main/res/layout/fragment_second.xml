@@ -34,14 +34,15 @@
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
             android:layout_below="@+id/textView3"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
             android:layout_marginTop="20dp"
             android:gravity="center"
-            android:text="Bugs are sometimes difficult to handle, But don&apos;t worry we got your back."
+            android:text="Don't go through your life unsure,\nif you don't understand something,\njust ask!"
             android:textColor="#ffffff"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
 </FrameLayout>

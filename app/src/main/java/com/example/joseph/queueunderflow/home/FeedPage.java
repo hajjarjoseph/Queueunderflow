@@ -15,8 +15,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.example.joseph.queueunderflow.DAL.ParseTransaction;
 import com.example.joseph.queueunderflow.QuestRecycler;
 import com.example.joseph.queueunderflow.R;
+import com.example.joseph.queueunderflow.authentication.IntroPage;
 import com.example.joseph.queueunderflow.basicpost.BasicPost;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
@@ -24,10 +26,12 @@ import com.example.joseph.queueunderflow.comments.Comment;
 import com.example.joseph.queueunderflow.comments.CommentsList;
 import com.example.joseph.queueunderflow.skills.SuggestSkills;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,6 +53,8 @@ public class FeedPage extends Fragment {
     @BindView(R.id.askBtn)
     TextView askBtn;
 
+    @BindView(R.id.logOutBtn)
+    TextView logOutBtn;
 
     private LinearLayoutManager mLinearLayoutManager;
     private QuestRecycler mAdapter;
@@ -60,6 +66,8 @@ public class FeedPage extends Fragment {
     public FeedPage() {
         // Required empty public constructor
     }
+
+
 
 
 
@@ -75,6 +83,15 @@ public class FeedPage extends Fragment {
         mLinearLayoutManager = new LinearLayoutManager(getContext());
         questlv.setLayoutManager(mLinearLayoutManager);
 
+        logOutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ParseUser.logOut();
+                Intent intent = new Intent(context.getContext(), IntroPage.class);
+                startActivity(intent);
+            }
+        });
+
 
         askBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,14 +102,6 @@ public class FeedPage extends Fragment {
 
             }
         });
-
-
-
-
-
-
-
-
 
         new LoadQuests().execute();
         return view;
@@ -105,146 +114,17 @@ public class FeedPage extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
-
-
-
-
-
-
-
-
-
     }
 
-    public void tagTap(){
-        new LoadQuests().execute();
-    }
 
 
     private class LoadQuests extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
 
-            items = new ArrayList<>();
+            ParseTransaction questionsTransaction = new ParseTransaction();
 
-            ParseQuery fetchQuests = new ParseQuery("Questions");
-            fetchQuests.orderByDescending("createdAt");
-            fetchQuests.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(java.util.List<ParseObject> objects, ParseException e) {
-                    if (e == null) {
-                        for (ParseObject userData : objects) {
-
-
-
-                            String title = userData.getString("title");
-                            String owner = "#";
-                            owner += userData.getString("owner");
-                            String description = userData.getString("description");
-                            Date postDate = userData.getCreatedAt();
-                            String postId = userData.getObjectId();
-                            boolean hasAnswer = userData.getBoolean("hasAnswer");
-                            boolean edited = userData.getBoolean("edited");
-                            int votes = userData.getInt("Votes");
-                            int upVotes = userData.getInt("upvotes");
-                            int downVotes = userData.getInt("downvotes");
-
-                           ArrayList<HashMap<String,String>> commentListArr = (ArrayList<HashMap<String,String>>) userData.get("comments");
-                           ArrayList<Comment> theList = new ArrayList<Comment>();
-                            HashMap<String, String> commentList = new HashMap<String, String>();
-                            if(commentListArr.size()>0) {
-
-                               for(int i=0;i<commentListArr.size();i++){
-                                   commentList = commentListArr.get(i);
-                                   Map.Entry<String,String> entry=commentList.entrySet().iterator().next();
-                                   Comment c = new Comment(entry.getKey(),entry.getValue());
-                                   theList.add(c);
-
-                               }
-                            }
-
-                            CommentsList finalCom = new CommentsList(theList);
-
-
-
-
-                            ArrayList<String> voters = (ArrayList<String>) userData.get("voters");
-                            ArrayList<String> tags = (ArrayList<String>) userData.get("tags");
-                            ArrayList<String> answersId = (ArrayList<String>) userData.get("answers");
-
-
-                            ArrayList<String> images = new ArrayList<String>();
-
-                            ParseFile qImage = (ParseFile) userData.get("image1");
-                            if(qImage == null){
-
-                                // Create BasicQuestion with no images
-                                BasicQuestion basicQuestion = new BasicQuestion(owner,title,description,postId,postDate,voters,tags,answersId);
-                                basicQuestion.setHasAnswer(hasAnswer);
-                                basicQuestion.setEdited(edited);
-                                basicQuestion.setVotes(upVotes-downVotes);
-                                basicQuestion.setCommentsList(finalCom);
-                                items.add(basicQuestion);
-
-                            }else{
-                                String imageUrl = qImage.getUrl() ;//live url
-
-
-                                images.add(imageUrl);
-
-
-                                qImage = (ParseFile) userData.get("image2");
-
-                                if(qImage == null){
-                                    //Do nothing
-                                }else{
-                                    imageUrl = qImage.getUrl() ;//live url
-
-
-                                    images.add(imageUrl);
-
-
-                                    qImage = (ParseFile) userData.get("image3");
-
-                                    if(qImage == null){
-
-                                    }else{
-                                        imageUrl = qImage.getUrl() ;//live url
-
-                                        images.add(imageUrl);
-                                    }
-
-
-                                }
-
-                                //Create ImageQuestion
-                                ImageQuestion imageQuestion = new ImageQuestion(owner,title,description,postId,postDate,tags,answersId,images,voters);
-                                imageQuestion.setHasAnswer(hasAnswer);
-                                imageQuestion.setEdited(edited);
-                                imageQuestion.setVotes(upVotes-downVotes);
-                                imageQuestion.setCommentsList(finalCom);
-                                items.add(imageQuestion);
-                            }
-
-
-
-
-
-
-
-                        }
-
-                        mAdapter = new QuestRecycler((BasePage) getActivity(),items);
-
-                        questlv.setAdapter(mAdapter);
-
-                    }
-                }
-
-            });
-
+            questionsTransaction.getQuestions(questlv,1);
 
             return null;
         }

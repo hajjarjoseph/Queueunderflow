@@ -61,6 +61,7 @@ public abstract class RadioAdapter<T> extends RecyclerView.Adapter<RadioAdapter.
     public ArrayList<Skill> skills;
     public Context mContext;
 
+
     public RadioAdapter(Context context, ArrayList<Skill> items) {
         mContext = context;
         skills = items;

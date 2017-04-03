@@ -1,118 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.joseph.queueunderflow.authentication.LogIn.LoginPage"
-    android:background="#334b5f">
+    android:background="@color/appMain"
+    tools:context="com.example.joseph.queueunderflow.authentication.LogIn.LoginPage">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
 
         <RelativeLayout
+            android:id="@+id/relativeLayout"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:background="#ffffff"
-            android:id="@+id/relativeLayout">
+            android:background="#ffffff">
 
             <TextView
+                android:id="@+id/signUpTxT"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Create my account! >"
-                android:id="@+id/signUpBtn"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:layout_alignParentEnd="true"
-                android:textSize="16sp"
-                android:layout_marginRight="20dp"
                 android:autoText="false"
-                android:textColor="#334b5f"/>
+                android:text="Create an Account"
+                android:textColor="#000"
+                android:textSize="16sp" />
         </RelativeLayout>
 
         <EditText
+            android:id="@+id/nameTF"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:id="@+id/nameTF"
-            android:layout_below="@+id/relativeLayout"
-            android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
-            android:background="#ffffff"
-            android:layout_marginTop="30dp"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/relativeLayout"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:textColor="#334b5f"
+            android:layout_marginTop="30dp"
+            android:background="#ffffff"
             android:hint="Full Name"
-            android:paddingLeft="20dp"/>
+            android:paddingLeft="20dp"
+            android:textColor="#000"
+            android:textColorHint="#000" />
 
         <EditText
+            android:id="@+id/usernameTF"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:id="@+id/usernameTF"
-            android:background="#ffffff"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/nameTF"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:textColor="#334b5f"
+            android:background="#ffffff"
             android:hint="username"
             android:paddingLeft="20dp"
-            android:layout_below="@+id/nameTF"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"/>
+            android:textColor="#000"
+            android:textColorHint="#000" />
 
         <EditText
+            android:id="@+id/emailTF"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:id="@+id/emailTF"
-            android:background="#ffffff"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/usernameTF"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:textColor="#334b5f"
+            android:background="#ffffff"
             android:hint="email"
             android:paddingLeft="20dp"
-            android:layout_below="@+id/usernameTF"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"/>
+            android:textColor="#000"
+            android:textColorHint="#000" />
 
         <EditText
+            android:id="@+id/passwordTF"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:inputType="textPassword"
-            android:ems="10"
-            android:id="@+id/passwordTF"
-            android:layout_below="@+id/emailTF"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentStart="true"
-            android:background="#ffffff"
+            android:layout_below="@+id/emailTF"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:layout_alignParentEnd="true"
+            android:background="#ffffff"
+            android:ems="10"
             android:hint="Password"
+            android:inputType="textPassword"
             android:paddingLeft="20dp"
-            android:textColor="#334b5f"/>
+            android:textColor="#000"
+            android:textColorHint="#000" />
 
-        <TextView
+        <Button
+            android:id="@+id/signUpBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Or"
-            android:id="@+id/textView7"
+            android:layout_alignEnd="@+id/passwordTF"
+            android:layout_alignLeft="@+id/passwordTF"
+            android:layout_alignRight="@+id/passwordTF"
+            android:layout_alignStart="@+id/passwordTF"
             android:layout_below="@+id/passwordTF"
-            android:layout_centerHorizontal="true"
-            android:textColor="#ffffff"
-            android:textSize="30sp"
-            android:textStyle="italic"
-            android:layout_marginTop="30dp"/>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="70dp"
-            android:id="@+id/imageView5"
-            android:layout_below="@+id/textView7"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/signfb"
-            android:layout_marginTop="50dp"/>
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="30dp"
+            android:backgroundTint="#fff"
+            android:text="Submit" />
 
     </RelativeLayout>
 </RelativeLayout>

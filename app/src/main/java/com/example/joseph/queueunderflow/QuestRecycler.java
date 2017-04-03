@@ -80,7 +80,7 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
 
     }
 
-    public QuestRecycler(SearchPage mainActivity, ArrayList<BasicPost> items) {
+    public QuestRecycler(Context mainActivity, ArrayList<BasicPost> items) {
 
         context = mainActivity;
         this.items = items;
