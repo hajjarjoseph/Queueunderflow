@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,8 +25,11 @@ import com.example.joseph.queueunderflow.basicpost.basicanswer.BasicAnswer;
 import com.example.joseph.queueunderflow.basicpost.basicanswer.imageanswer.ImageAnswer;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
+import com.example.joseph.queueunderflow.comments.Comment;
+import com.example.joseph.queueunderflow.comments.CommentsList;
 import com.example.joseph.queueunderflow.headquarters.QuestionsList;
 import com.example.joseph.queueunderflow.headquarters.skills.SkillLoader;
+import com.example.joseph.queueunderflow.home.BasePage;
 import com.example.joseph.queueunderflow.submitpost.SubmitQuestion;
 import com.example.joseph.queueunderflow.viewpager.ViewPagerAdapter;
 import com.parse.FindCallback;
@@ -37,6 +41,8 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,6 +55,8 @@ public class CardPage extends AppCompatActivity  {
     @BindView(R.id.postBtn)
     TextView postBtn;
 
+    @BindView(R.id.backBtn)
+    ImageView backBtn;
     private LinearLayoutManager mLinearLayoutManager;
     private PostRecycler mAdapter;
 
@@ -87,6 +95,12 @@ public class CardPage extends AppCompatActivity  {
         mLinearLayoutManager = new LinearLayoutManager(this);
         poslv.setLayoutManager(mLinearLayoutManager);
 
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
 
         mAdapter = new PostRecycler(CardPage.this,theQuestion,mAdapter);
@@ -112,6 +126,12 @@ public class CardPage extends AppCompatActivity  {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(CardPage.this, BasePage.class);
+        startActivity(intent);
+    }
+
 
 
     private class LoadPost extends AsyncTask<Void, Void, Void> {
@@ -133,6 +153,28 @@ public class CardPage extends AppCompatActivity  {
                             Date postDate = userData.getCreatedAt();
                             String postId = userData.getObjectId();
 
+                            int votes = userData.getInt("Votes");
+                            int upVotes = userData.getInt("upvotes");
+                            int downVotes = userData.getInt("downvotes");
+
+                            ArrayList<String> voters = (ArrayList<String>) userData.get("voters");
+
+                            ArrayList<HashMap<String,String>> commentListArr = (ArrayList<HashMap<String,String>>) userData.get("comments");
+                            ArrayList<Comment> theList = new ArrayList<Comment>();
+                            HashMap<String, String> commentList = new HashMap<String, String>();
+                            if(commentListArr.size()>0) {
+
+                                for(int i=0;i<commentListArr.size();i++){
+                                    commentList = commentListArr.get(i);
+                                    Map.Entry<String,String> entry=commentList.entrySet().iterator().next();
+                                    Comment c = new Comment(entry.getKey(),entry.getValue());
+                                    theList.add(c);
+
+                                }
+                            }
+
+                            CommentsList finalCom = new CommentsList(theList);
+
 
                             ArrayList<String> images = new ArrayList<String>();
 
@@ -141,6 +183,9 @@ public class CardPage extends AppCompatActivity  {
 
                                 // Create BasicQuestion with no images
                                 BasicAnswer basicAnswer = new BasicAnswer(owner,description,postId,postDate,false);
+                                basicAnswer.setVotes(upVotes-downVotes);
+                                basicAnswer.setVoters(voters);
+                                basicAnswer.setCommentsList(finalCom);
                                 ArrayList<BasicAnswer> answers = theQuestion.getAnswersList();
                                 answers.add(basicAnswer);
                                 theQuestion.setAnswersList(answers);
@@ -178,6 +223,9 @@ public class CardPage extends AppCompatActivity  {
                                 }
 
                                 ImageAnswer imageAnswer = new ImageAnswer(owner,description,postId,postDate,images,false);
+                                imageAnswer.setVotes(upVotes-downVotes);
+                                imageAnswer.setVoters(voters);
+                                imageAnswer.setCommentsList(finalCom);
                                 ArrayList<BasicAnswer> answers = theQuestion.getAnswersList();
                                 answers.add(imageAnswer);
                                 theQuestion.setAnswersList(answers);

@@ -24,10 +24,15 @@ import android.widget.TextView;
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.NoAnimation;
+import com.example.joseph.queueunderflow.alerts.OthersPostAlert;
+import com.example.joseph.queueunderflow.alerts.OwnPostAlert;
 import com.example.joseph.queueunderflow.authentication.IntroPage;
 import com.example.joseph.queueunderflow.authentication.askquestion.AskQuestionMain;
 import com.example.joseph.queueunderflow.basicpost.BasicPost;
+import com.example.joseph.queueunderflow.basicpost.basicanswer.BasicAnswer;
+import com.example.joseph.queueunderflow.basicpost.basicanswer.imageanswer.ImageAnswer;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
+import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
 import com.example.joseph.queueunderflow.cardpage.CardPage;
 import com.example.joseph.queueunderflow.headquarters.MainPage;
 import com.example.joseph.queueunderflow.headquarters.QuestionsList;
@@ -66,16 +71,16 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
 
     private Context context;
 
-    private ProgressBar loadingBar;
-    private ImageView doneLoading;
-    private Dialog loadingDialog;
+
     private ReputationFactory reputationGiver;
+    private String currUser;
 
 
     public QuestRecycler(BasePage mainActivity, ArrayList<BasicPost> items) {
 
         context = mainActivity;
         this.items = items;
+        this.currUser = ParseUser.getCurrentUser().getUsername();
 
 
     }
@@ -84,6 +89,7 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
 
         context = mainActivity;
         this.items = items;
+        this.currUser = ParseUser.getCurrentUser().getUsername();
 
     }
 
@@ -229,7 +235,14 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
             holder.optionBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    optionAlert(items.get(position).getPostId().toString());
+                    if(items.get(position).getqOwner().equals("#" + currUser)){
+                        OwnPostAlert ownQuestAlert = new OwnPostAlert(context, (BasicQuestion) items.get(position),items.get(position).getPostId() );
+                        ownQuestAlert.show();
+                    }else {
+                        OthersPostAlert otherAlert = new OthersPostAlert(context,items.get(position));
+                        otherAlert.show();
+
+                    }
                 }
             });
 
@@ -349,76 +362,7 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
 
 
 
-    public void confirmationAlert(final String postId){
-        final Dialog dialog = new Dialog(context);
 
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-
-        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        dialog.setContentView(R.layout.answerdialog);
-
-        final TextView answerMsg = (TextView) dialog.findViewById(R.id.answerMsg);
-        final TextView yesBtn = (TextView) dialog.findViewById(R.id.yesBtnAns);
-        final TextView noBtn = (TextView) dialog.findViewById(R.id.noBtnAns);
-        final ProgressBar prog = (ProgressBar) dialog.findViewById(R.id.progressAns);
-        final ImageView doneImg = (ImageView) dialog.findViewById(R.id.doneImg);
-
-        answerMsg.setText("Are you sure you want to flag this post?");
-
-        prog.setVisibility(View.INVISIBLE);
-        doneImg.setVisibility(View.INVISIBLE);
-
-        yesBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                answerMsg.setVisibility(View.INVISIBLE);
-                yesBtn.setVisibility(View.INVISIBLE);
-                noBtn.setVisibility(View.INVISIBLE);
-                prog.setVisibility(View.VISIBLE);
-
-                prog.getIndeterminateDrawable().setColorFilter(Color.parseColor("#32BEA6"), PorterDuff.Mode.SRC_IN);
-
-                ParseQuery query = new ParseQuery("Questions");
-                query.whereEqualTo("objectId",postId);
-                query.findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(java.util.List<ParseObject> objects, ParseException e) {
-                        if (e == null) {
-                            for (final ParseObject userData : objects) {
-                                userData.put("flagged",true);
-
-                                userData.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if(e == null){
-                                            prog.setVisibility(View.INVISIBLE);
-                                            dialog.dismiss();
-                                            thankYouMessage();
-
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }
-                });
-
-
-            }
-        });
-
-        noBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
-
-    }
 
 
     public void createAlert(String message){
@@ -438,120 +382,8 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
         dialog.show();
     }
 
-    public void thankYouMessage(){
-        final Dialog dialog = new Dialog(context);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        dialog.setContentView(R.layout.thankyoumessage);
-
-        dialog.show();
-    }
-
-    public void optionAlert(final String postId){
-        final Dialog dialog = new Dialog(context);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        dialog.setContentView(R.layout.optiondialog);
-
-        RelativeLayout flagLayout = (RelativeLayout) dialog.findViewById(R.id.flagPost);
-        RelativeLayout subscribeLayout = (RelativeLayout) dialog.findViewById(R.id.subscribePost);
-
-        flagLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-                confirmationAlert(postId);
-            }
-        });
-
-        subscribeLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-                createLoading();
-
-                ParseQuery findUser = new ParseQuery("_User");
-                findUser.whereEqualTo("username",ParseUser.getCurrentUser().getUsername());
-                findUser.findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(java.util.List<ParseObject> objects, ParseException e) {
-
-                        if(e == null){
-                            for(ParseObject userData:objects ){
-
-                                userData.add("subscribedPosts",postId);
-                                userData.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        ParseQuery findPost = new ParseQuery("Questions");
-                                        findPost.whereEqualTo("objectId",postId);
-                                        findPost.findInBackground(new FindCallback<ParseObject>() {
-                                            @Override
-                                            public void done(java.util.List<ParseObject> objects, ParseException e) {
-
-                                                if(e == null){
-                                                    for(ParseObject userData:objects ){
-
-                                                        ArrayList<String> subsUsers = (ArrayList<String>) userData.get("subcribedUsers");
-                                                        subsUsers.add(ParseUser.getCurrentUser().getUsername());
-                                                        userData.put("subcribedUsers",subsUsers);
-
-                                                        userData.saveInBackground(new SaveCallback() {
-                                                            @Override
-                                                            public void done(ParseException e) {
-                                                                if(e == null){
-                                                                    loadingBar.setVisibility(View.INVISIBLE);
-                                                                    doneLoading.setVisibility(View.VISIBLE);
-                                                                    new Handler().postDelayed(new Runnable() {
-                                                                        @Override
-                                                                        public void run() {
-
-                                                                            loadingDialog.dismiss();
-
-                                                                        }
-                                                                    }, 2000);
 
 
-                                                                }else {
-                                                                    createAlert(e.getMessage());
-                                                                }
-                                                            }
-                                                        });
-
-
-
-                                                    }
-
-
-                                                }
-
-                                            }
-
-                                        });
-                                    }
-                                });
-
-
-
-
-
-                            }
-
-
-                        }
-
-                    }
-
-                });
-
-
-            }
-        });
-
-
-        dialog.show();
-    }
 
     public String nametoDrawable(String skillName){
         String skillImgName = "drawable/";
@@ -564,26 +396,7 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
         return skillImgName;
     }
 
-    public void createLoading(){
-        loadingDialog = new Dialog(context);
-        loadingDialog.setCancelable(false);
-        loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        loadingDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        loadingDialog.setContentView(R.layout.postingloading);
-        loadingDialog.setCancelable(false);
 
-        loadingBar = (ProgressBar) loadingDialog.findViewById(R.id.loadingBar);
-
-
-        loadingBar.getIndeterminateDrawable().setColorFilter(Color.parseColor("#32BEA6"), PorterDuff.Mode.SRC_IN);
-
-        doneLoading = (ImageView) loadingDialog.findViewById(R.id.doneLoading);
-
-
-
-
-        loadingDialog.show();
-    }
 
 
 

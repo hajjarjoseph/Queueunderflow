@@ -1,10 +1,8 @@
-package com.example.joseph.queueunderflow.selectiontopic;
+package com.example.joseph.queueunderflow.interest;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
@@ -12,29 +10,24 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.joseph.queueunderflow.R;
-import com.example.joseph.queueunderflow.comments.CommentsList;
 import com.example.joseph.queueunderflow.headquarters.skills.Skill;
-import com.example.joseph.queueunderflow.reputation.ReputationFactory;
 import com.example.joseph.queueunderflow.skills.SkillListRecycler;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Created by josep on 4/3/2017.
+ * Created by josep on 4/4/2017.
  */
 
-public class TopicListRecycler extends RecyclerView.Adapter<com.example.joseph.queueunderflow.selectiontopic.TopicListRecycler.PhotoHolder> {
+public class InterestRecycler extends RecyclerView.Adapter<com.example.joseph.queueunderflow.interest.InterestRecycler.PhotoHolder> {
 
 
     private Context context;
@@ -54,7 +47,7 @@ public class TopicListRecycler extends RecyclerView.Adapter<com.example.joseph.q
 
     public ArrayList<String> selectedSkills;
 
-    public TopicListRecycler(Context context, ArrayList<Skill> skills,boolean searchMode) {
+    public InterestRecycler(Context context, ArrayList<Skill> skills) {
 
         this.context = context;
         this.skills = new ArrayList<>();
@@ -64,12 +57,7 @@ public class TopicListRecycler extends RecyclerView.Adapter<com.example.joseph.q
         this.selectedSkills = new ArrayList<>();
 
 
-        if(!searchMode){
-            this.fullSkills = new ArrayList<>();
-           for(int i=0;i<this.skills.size();i++){
-               this.fullSkills.add(this.skills.get(i));
-           }
-        }
+
 
 
     }
@@ -78,52 +66,22 @@ public class TopicListRecycler extends RecyclerView.Adapter<com.example.joseph.q
 
 
     @Override
-    public com.example.joseph.queueunderflow.selectiontopic.TopicListRecycler.PhotoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public com.example.joseph.queueunderflow.interest.InterestRecycler.PhotoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View inflatedView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.skillslayout, parent, false);
-        return new com.example.joseph.queueunderflow.selectiontopic.TopicListRecycler.PhotoHolder(inflatedView);
+        return new com.example.joseph.queueunderflow.interest.InterestRecycler.PhotoHolder(inflatedView);
     }
 
     @Override
-    public void onBindViewHolder(final com.example.joseph.queueunderflow.selectiontopic.TopicListRecycler.PhotoHolder holder, final int position) {
+    public void onBindViewHolder(final com.example.joseph.queueunderflow.interest.InterestRecycler.PhotoHolder holder, final int position) {
 
 
 
         holder.mText.setText(skills.get(position).getName());
-         final Skill skill = skills.get(position);
 
-        if(skill.isSelected()){
-            holder.mRadio.setChecked(true);
-        }else{
-            holder.mRadio.setChecked(false);
-        }
+        holder.mRadio.setVisibility(View.GONE);
 
 
-
-        holder.mRadio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                boolean isSelected = skill.isSelected();
-                if(!isSelected){
-                    holder.mRadio.setChecked(true);
-                    selectedSkills.add(skills.get(position).getName());
-                    skill.setSelected(true);
-                    skills.set(position,skill);
-                    updateFullSkills(skill);
-                }else{
-                    holder.mRadio.setChecked(false);
-                    for(int i=0;i<selectedSkills.size();i++){
-                        if(selectedSkills.get(i).equals(skills.get(position).getName())){
-                            selectedSkills.remove(i);
-
-                            skill.setSelected(false);
-                            skills.set(position,skill);
-                           updateFullSkills(skill);
-                        }
-                    }
-                }
-            }
-        });
         final Uri imageUri = skills.get(position).getSkillUrl();
 
         new AsyncTask<Void, Void, Void>() {
@@ -247,7 +205,7 @@ public class TopicListRecycler extends RecyclerView.Adapter<com.example.joseph.q
         return skillImgName;
     }
 
-   private  void updateFullSkills(Skill skill){
+    private  void updateFullSkills(Skill skill){
         for(int i=0;i<fullSkills.size();i++){
             if(fullSkills.get(i).getName().equals(skill.getName())){
                 fullSkills.set(i,skill);
@@ -267,7 +225,7 @@ public class TopicListRecycler extends RecyclerView.Adapter<com.example.joseph.q
             for(int i=0;i<fullSkills.size();i++){
                 if(fullSkills.get(i).getName().toLowerCase().contains(searchText.toLowerCase())){
                     skills.add(fullSkills.get(i));
-                   notifyDataSetChanged();
+                    notifyDataSetChanged();
                 }
             }
         }

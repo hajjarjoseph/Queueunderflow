@@ -85,7 +85,9 @@
         ;
         <activity android:name=".comments.CommentsPage" />
         <activity android:name=".reset.ResetPage" />
-        <activity android:name=".selectiontopic.SelectTopicPage"></activity>
+        <activity android:name=".selectiontopic.SelectTopicPage" />
+        <activity android:name=".interest.InterestPage" />
+        <activity android:name=".profile.ProfileActivity"></activity>
     </application>
 
 </manifest>

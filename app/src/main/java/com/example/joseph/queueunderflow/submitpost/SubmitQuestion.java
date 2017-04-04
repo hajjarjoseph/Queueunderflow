@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +29,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.example.joseph.queueunderflow.R;
+import com.example.joseph.queueunderflow.basicpost.BasicPost;
+import com.example.joseph.queueunderflow.basicpost.basicanswer.imageanswer.ImageAnswer;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
 import com.example.joseph.queueunderflow.cardpage.CardPage;
@@ -72,6 +75,8 @@ public class SubmitQuestion extends AppCompatActivity {
     LinearLayout photoContainer;
     @BindView(R.id.titlePick)
     EditText titlePick;
+    @BindView(R.id.backButton)
+    ImageButton backButton;
     @BindView(R.id.descriptionPick)
     EditText descriptionPick;
     @BindView(R.id.postBtn)
@@ -111,7 +116,7 @@ private BasicQuestion question;
     ArrayList<Bitmap> bmpList = new ArrayList<>();
 
     private int imgStatus = -1;
-    private BasicQuestion editedPost;
+    private BasicPost editedPost;
     private BasicQuestion theQuestion;
 
     private int fromActivity;
@@ -127,6 +132,12 @@ private BasicQuestion question;
         setContentView(R.layout.activity_submit_question);
         ButterKnife.bind(this);
 
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
         bmpList.add(bmp1);
         bmpList.add(bmp2);
         bmpList.add(bmp3);
@@ -140,19 +151,36 @@ private BasicQuestion question;
             if(fromActivity == 1) {
                 tag = extras.getString("skill");
             }else if(fromActivity == 2){
-               editedPost =  (BasicQuestion) extras.getSerializable("editPost");
-                titlePick.setText(editedPost.getqTitle());
-                descriptionPick.setText(editedPost.getqDescription());
-                ArrayList<String> urlList = ((ImageQuestion) editedPost).getImagesUri();
-                ArrayList<Uri>uriList = new ArrayList<>();
-                for(int i=0;i<urlList.size();i++){
-                    Uri imageUri = Uri.parse(urlList.get(i).toString());
-                    uriList.add(imageUri);
+               editedPost = (BasicPost) extras.getSerializable("editPost");
+                if(editedPost instanceof BasicQuestion){
+                    titlePick.setText(((BasicQuestion) editedPost).getqTitle());
                 }
 
-                if(editedPost instanceof ImageQuestion){
-                    postBtn.setText("Edit");
-                    imgStatus = ((ImageQuestion)editedPost).getImagesUri().size() - 1;
+                descriptionPick.setText(editedPost.getqDescription());
+                 postBtn.setText("Edit");
+
+
+
+                }
+
+                if(editedPost instanceof ImageQuestion || editedPost instanceof ImageAnswer){
+                    ArrayList<String> urlList = new ArrayList<>();
+                    if(editedPost instanceof ImageQuestion){
+                        urlList = ((ImageQuestion) editedPost).getImagesUri();
+                    }else{
+                        urlList = ((ImageAnswer) editedPost).getImagesUri();
+                    }
+
+                    ArrayList<Uri>uriList = new ArrayList<>();
+                    for(int i=0;i<urlList.size();i++){
+                        Uri imageUri = Uri.parse(urlList.get(i).toString());
+                        uriList.add(imageUri);
+                        if(editedPost instanceof ImageQuestion ){
+                            imgStatus = ((ImageQuestion)editedPost).getImagesUri().size() - 1;
+                        }else{
+                            imgStatus = ((ImageAnswer)editedPost).getImagesUri().size() - 1;
+                        }
+
                     if(imgStatus == 0){
                         photoContainer.setVisibility(View.VISIBLE);
                         Glide.with(this)
@@ -305,6 +333,7 @@ private BasicQuestion question;
                         post.put("upvotes",0);
                         post.put("downvotes",0);
                         post.put("voters",emptyStr);
+                        post.put("comments",emptyStr);
 
                         bindImgs(post);
 
@@ -356,7 +385,7 @@ private BasicQuestion question;
                     }
 
                 }else if(fromActivity == 2){
-                    if(titlePick.getText().toString().isEmpty()){
+                    if(titlePick.getText().toString().isEmpty() && (editedPost instanceof BasicQuestion || editedPost instanceof ImageQuestion)){
                         createAlert("Title Field cannot be empty!");
                     }else if(descriptionPick.getText().toString().isEmpty()){
                         createAlert("Description Field cannot be empty!");
@@ -368,45 +397,47 @@ private BasicQuestion question;
                         ArrayList<String> skillList = new ArrayList<String>();
                         skillList.add(tag);
 
-                        ParseQuery findPost = new ParseQuery("Questions");
-                        findPost.whereEqualTo("objectId",editedPost.getPostId());
-                        findPost.findInBackground(new FindCallback<ParseObject>() {
-                            @Override
-                            public void done(java.util.List<ParseObject> objects, ParseException e) {
+                        if(editedPost instanceof BasicQuestion || editedPost instanceof ImageQuestion){
 
-                                if(e == null){
-                                    for(ParseObject userData:objects ){
+                            ParseQuery findPost = new ParseQuery("Questions");
+                            findPost.whereEqualTo("objectId",editedPost.getPostId());
+                            findPost.findInBackground(new FindCallback<ParseObject>() {
+                                @Override
+                                public void done(java.util.List<ParseObject> objects, ParseException e) {
 
-                                        userData.put("title",title);
-                                        userData.put("description",description);
-                                        userData.put("edited",true);
+                                    if(e == null){
+                                        for(ParseObject userData:objects ){
 
-                                        bindImgs(userData);
+                                            userData.put("title",title);
+                                            userData.put("description",description);
+                                            userData.put("edited",true);
 
-                                        userData.saveInBackground(new SaveCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-                                                if(e == null){
-                                                    loadingBar.setVisibility(View.INVISIBLE);
-                                                    doneLoading.setVisibility(View.VISIBLE);
-                                                    new Handler().postDelayed(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            Intent intent = new Intent(SubmitQuestion.this, BasePage.class);
-                                                            startActivity(intent);
+                                            bindImgs(userData);
 
-                                                        }
-                                                    }, 2000);
+                                            userData.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                    if(e == null){
+                                                        loadingBar.setVisibility(View.INVISIBLE);
+                                                        doneLoading.setVisibility(View.VISIBLE);
+                                                        new Handler().postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                Intent intent = new Intent(SubmitQuestion.this, BasePage.class);
+                                                                startActivity(intent);
 
-                                                }else {
-                                                    createAlert(e.getMessage());
+                                                            }
+                                                        }, 2000);
+
+                                                    }else {
+                                                        createAlert(e.getMessage());
+                                                    }
                                                 }
-                                            }
-                                        });
+                                            });
 
 
 
-                                    }
+                                        }
 
 
                                     }
@@ -414,6 +445,57 @@ private BasicQuestion question;
                                 }
 
                             });
+
+                        }else{
+
+                            ParseQuery findPost = new ParseQuery("Answers");
+                            findPost.whereEqualTo("objectId",editedPost.getPostId());
+                            findPost.findInBackground(new FindCallback<ParseObject>() {
+                                @Override
+                                public void done(java.util.List<ParseObject> objects, ParseException e) {
+
+                                    if(e == null){
+                                        for(ParseObject userData:objects ){
+
+
+                                            userData.put("Description",description);
+                                            userData.put("edited",true);
+
+                                            bindImgs(userData);
+
+                                            userData.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                    if(e == null){
+                                                        loadingBar.setVisibility(View.INVISIBLE);
+                                                        doneLoading.setVisibility(View.VISIBLE);
+                                                        new Handler().postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                Intent intent = new Intent(SubmitQuestion.this, BasePage.class);
+                                                                startActivity(intent);
+
+                                                            }
+                                                        }, 2000);
+
+                                                    }else {
+                                                        createAlert(e.getMessage());
+                                                    }
+                                                }
+                                            });
+
+
+
+                                        }
+
+
+                                    }
+
+                                }
+
+                            });
+                        }
+
 
 
                         }
@@ -423,9 +505,17 @@ private BasicQuestion question;
                     }else{
                          createLoading();
                          final ParseObject newAnswer = new ParseObject("Answers");
+                         ArrayList<String>emptyStr = new ArrayList<String>();
                          newAnswer.put("owner",ParseUser.getCurrentUser().getUsername());
                          newAnswer.put("Description",descriptionPick.getText().toString());
                          newAnswer.put("posterid",theQuestion.getPostId());
+                         newAnswer.put("flagged",false);
+                         newAnswer.put("edited",false);
+                         newAnswer.put("Votes",0);
+                         newAnswer.put("upvotes",0);
+                         newAnswer.put("downvotes",0);
+                         newAnswer.put("voters",emptyStr);
+                         newAnswer  .put("comments",emptyStr);
                          bindImgs(newAnswer);
 
 
@@ -846,7 +936,7 @@ private BasicQuestion question;
 
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 // Compress image to lower quality scale 1 - 100
-                bmp1.compress(Bitmap.CompressFormat.PNG, 10, stream);
+                bmp1.compress(Bitmap.CompressFormat.PNG, 80, stream);
                 byte[] image = stream.toByteArray();
 
                 // Create the ParseFile

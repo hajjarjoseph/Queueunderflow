@@ -52,7 +52,7 @@
             android:paddingTop="10dp">
 
             <ImageView
-                android:id="@+id/imageView11"
+                android:id="@+id/upBtn"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_alignParentLeft="true"
@@ -69,7 +69,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="20dp"
-                android:layout_toRightOf="@+id/imageView11"
+                android:layout_toRightOf="@+id/upBtn"
                 android:paddingLeft="50dp"
                 android:text="Subscirbe Post"
                 android:textColor="@android:color/black" />

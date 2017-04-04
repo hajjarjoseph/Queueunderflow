@@ -1,6 +1,7 @@
 package com.example.joseph.queueunderflow.comments;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +13,10 @@ import android.widget.TextView;
 
 import com.example.joseph.queueunderflow.QuestRecycler;
 import com.example.joseph.queueunderflow.R;
+import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
+import com.example.joseph.queueunderflow.cardpage.CardPage;
+import com.example.joseph.queueunderflow.cardpage.PostRecycler;
+import com.example.joseph.queueunderflow.submitpost.SubmitQuestion;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -35,7 +40,12 @@ public class CommentsPage extends AppCompatActivity {
     private LinearLayoutManager mLinearLayoutManager;
     private CommentsRecycler mAdapter;
     private CommentsList commentsList;
+    private PostRecycler context;
     private String postId;
+    private int fromPost;// 0 pressed from question and 1 from answer
+    private int pos;
+    private BasicQuestion theQuestion;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +58,10 @@ public class CommentsPage extends AppCompatActivity {
         if (extras != null) {
             commentsList = (CommentsList) extras.get("commentList");
             postId = extras.getString("thePostId");
+            fromPost = extras.getInt("fromPost");
+            pos = extras.getInt("pos");
+            theQuestion = (BasicQuestion) extras.get("theQuestion");
+
 
             mLinearLayoutManager = new LinearLayoutManager(this);
             commentslv.setLayoutManager(mLinearLayoutManager);
@@ -56,6 +70,7 @@ public class CommentsPage extends AppCompatActivity {
             commentslv.setAdapter(mAdapter);
 
         }
+
 
 
 
@@ -76,7 +91,13 @@ public class CommentsPage extends AppCompatActivity {
                     newC.put(userC,bodyC);
 
                     final Comment newCom = new Comment(userC,bodyC);
-                    ParseQuery findQ = new ParseQuery("Questions");
+                    ParseQuery findQ = new ParseQuery("");
+                    if(fromPost == 0){
+                        findQ = new ParseQuery("Questions");
+                    }else{
+                        findQ = new ParseQuery("Answers");
+                    }
+
                     findQ.whereEqualTo("objectId",postId);
                     findQ.findInBackground(new FindCallback<ParseObject>() {
                         @Override
@@ -90,6 +111,14 @@ public class CommentsPage extends AppCompatActivity {
 
                                     commentsList.addComment(newCom);
                                     mAdapter.notifyDataSetChanged();
+
+                                    if(fromPost == 0){
+                                        theQuestion.setCommentsList(commentsList);
+                                    }
+
+
+
+
                                 }
                             }
                         }
@@ -100,6 +129,17 @@ public class CommentsPage extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(CommentsPage.this, CardPage.class);
+
+        intent.putExtra("postDetail",theQuestion);
+
+
+
+        startActivity(intent);
     }
 
     public void createAlert(String message){

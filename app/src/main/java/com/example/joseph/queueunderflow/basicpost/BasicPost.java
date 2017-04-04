@@ -144,7 +144,10 @@ abstract public class BasicPost implements Serializable {
     }
 
     public void setVoters(ArrayList<String> voters) {
-        this.voters = voters;
+        this.voters = new ArrayList<>();
+        for(int i=0;i<voters.size();i++){
+            this.voters.add(voters.get(i));
+        }
     }
 
 

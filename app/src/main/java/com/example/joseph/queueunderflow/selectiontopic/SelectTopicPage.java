@@ -71,11 +71,7 @@ public class SelectTopicPage extends Activity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 searchText = searchField.getText().toString();
 
-
-
                 searchFunct(searchText);
-
-
 
             }
 
@@ -126,7 +122,7 @@ public class SelectTopicPage extends Activity {
 
 
 
-                        mAdapter = new TopicListRecycler(SelectTopicPage.this, skills);
+                        mAdapter = new TopicListRecycler(SelectTopicPage.this, skills,false);
 
                         skillslv.setAdapter(mAdapter);
 
@@ -148,7 +144,7 @@ public class SelectTopicPage extends Activity {
                                             if (e == null) {
                                                 for (ParseObject userData : objects) {
 
-                                                   userData.add("skills",mAdapter.getSelectedSkills());
+                                                   userData.put("skills",mAdapter.getSelectedSkills());
                                                     userData.saveInBackground(new SaveCallback() {
                                                         @Override
                                                         public void done(ParseException e) {
@@ -196,55 +192,11 @@ public class SelectTopicPage extends Activity {
     }
 
     public void searchFunct(final String theTxT){
-        skills = new ArrayList<>();
 
-        ParseQuery fetchSkills = new ParseQuery("Skills");
-        fetchSkills.orderByDescending("createdAt");
-        fetchSkills.whereContains("name", theTxT);
-
-        fetchSkills.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(java.util.List<ParseObject> objects, ParseException e) {
-
-                if(e == null){
-                    for(ParseObject userData:objects ){
-
-                        skill = new Skill();
-
-                        //Gets the name of the Skill
-                        skillName = userData.getString("name");
-
-                        //Gets the icon of the Skill
-                        ParseFile skillImage = (ParseFile) userData.get("icon");
-                        String imageUrl = skillImage.getUrl() ;//live url
-                        Uri imageUri = Uri.parse(imageUrl);
-
-                        //Set name and icon
-                        skill.setSkillUrl(imageUri);
-                        skill.setName(skillName);
-                        if(searchText.equals(theTxT)){
-                            skills.add(skill);
-                        }
-
-
-                    }
+        mAdapter.searchList(theTxT);
 
 
 
-
-
-                    mAdapter.updateSkillsList(skills);
-
-
-                    //skills = new ArrayList<Skill>();
-
-
-                }
-
-            }
-
-
-        });
 
     }
 

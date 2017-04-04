@@ -54,6 +54,7 @@ public class CustomGridAdapter extends BaseAdapter {
     private Context mContext;
     LayoutInflater layoutInflater;
     private ArrayList<Skill>skillsList;
+    private SearchFragment frags;
 
     // Gets the context so it can be used later
     public CustomGridAdapter(Context c) {
@@ -61,9 +62,10 @@ public class CustomGridAdapter extends BaseAdapter {
         skillsList = new ArrayList<>();
     }
 
-    public CustomGridAdapter(Context c,ArrayList<Skill>skillsList) {
+    public CustomGridAdapter(Context c,ArrayList<Skill>skillsList,SearchFragment fragS) {
         mContext = c;
         this.skillsList = skillsList;
+        this.frags = fragS;
     }
 
     // Total number of things contained within the adapter
@@ -95,10 +97,20 @@ public class CustomGridAdapter extends BaseAdapter {
 
 
 
+
+
             if(skillsList.size()>0){
-                Skill skill = skillsList.get(position);
+                final Skill skill = skillsList.get(position);
                 item1Name.setText(skill.getName());
                 Glide.with(mContext).load(skill.getSkillUrl()).into(item1Img);
+
+                item1Img.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((SearchFragment)frags).tagPress(skill.getName());
+                    }
+                });
+
             }
 
 

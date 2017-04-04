@@ -1,19 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.joseph.queueunderflow.profile.ProfilePage">
+    tools:context="com.example.joseph.queueunderflow.profile.ProfileActivity">
 
     <!-- TODO: Update blank fragment layout -->
 
     <RelativeLayout
         android:id="@+id/relativeLayout5"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="250dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/relativeLayout2">
+        android:layout_below="@+id/relativeLayout2"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="0dp">
 
         <ImageView
             android:id="@+id/bgpicture"
@@ -34,10 +37,9 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="60dp"
-            app:civ_border_width="1dp"
-            app:civ_border_color="#D3D3D3"
             android:src="@drawable/miniowl"
-           />
+            app:civ_border_color="#D3D3D3"
+            app:civ_border_width="1dp" />
 
         <TextView
             android:id="@+id/userNameField"
@@ -58,11 +60,13 @@
 
     <TabHost
         android:id="@+id/tabhost"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_below="@+id/relativeLayout5"
 
-        android:background="@android:color/white">
+        android:background="@android:color/white"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -121,7 +125,7 @@
             <TabWidget
                 android:id="@android:id/tabs"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content">
 
 
             </TabWidget>
@@ -156,7 +160,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        app:srcCompat="@drawable/settico" />
-
+        app:srcCompat="@drawable/settico"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
 
 </RelativeLayout>

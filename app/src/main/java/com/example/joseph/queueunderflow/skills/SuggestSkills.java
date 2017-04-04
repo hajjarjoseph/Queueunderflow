@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.example.joseph.queueunderflow.R;
 import com.example.joseph.queueunderflow.headquarters.skills.Skill;
@@ -37,6 +38,8 @@ public class SuggestSkills extends AppCompatActivity {
     Button nextBtn;
     @BindView(R.id.searchTxt)
     EditText searchField;
+    @BindView(R.id.backButton)
+    ImageButton backButton;
 
     private ArrayList<Skill> skills;
     Skill skill;
@@ -59,6 +62,13 @@ public class SuggestSkills extends AppCompatActivity {
 
         mLinearLayoutManager = new LinearLayoutManager(this);
         skillslv.setLayoutManager(mLinearLayoutManager);
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         new LoadQuests().execute();
 

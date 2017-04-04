@@ -1,15 +1,18 @@
 package com.example.joseph.queueunderflow.DAL;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 
 import com.example.joseph.queueunderflow.QuestRecycler;
+import com.example.joseph.queueunderflow.authentication.IntroPage;
 import com.example.joseph.queueunderflow.basicpost.BasicPost;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
 import com.example.joseph.queueunderflow.comments.Comment;
 import com.example.joseph.queueunderflow.comments.CommentsList;
 import com.example.joseph.queueunderflow.home.BasePage;
+import com.example.joseph.queueunderflow.selectiontopic.SelectTopicPage;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -64,6 +67,10 @@ public class ParseTransaction {
                         for (ParseObject userData : objects) {
 
                             userTopics = (ArrayList<String>) userData.get("skills");
+                            if(userTopics.size() == 0){
+                                Intent intent = new Intent(widgi.getContext(), SelectTopicPage.class);
+                                widgi.getContext().startActivity(intent);
+                            }
                         }
 
                         fetchQuests.whereContainedIn("tags",userTopics);

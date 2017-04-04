@@ -94,35 +94,39 @@
             android:background="@layout/answerborder">
 
             <ImageView
-                android:id="@+id/imageView11"
+                android:id="@+id/upBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="25dp"
-                android:layout_above="@+id/textView13"
+
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="15dp"
                 android:background="@layout/upbutton"
-                android:src="@drawable/thumbsup" />
+                android:src="@drawable/thumbsup"
+                android:visibility="visible" />
 
             <ImageView
-                android:id="@+id/imageView12"
+                android:id="@+id/downBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="25dp"
 
-                android:layout_alignLeft="@+id/imageView11"
-                android:layout_alignStart="@+id/imageView11"
-                android:layout_below="@+id/imageView11"
-                android:layout_marginTop="20dp"
+                android:layout_alignLeft="@+id/upBtn"
+                android:layout_alignStart="@+id/upBtn"
+                android:layout_below="@+id/upBtn"
+                android:layout_marginTop="5dp"
                 android:background="@layout/upbutton"
-                android:src="@drawable/thumsdown" />
+                android:src="@drawable/thumsdown"
+                android:visibility="visible" />
 
             <TextView
-                android:id="@+id/textView13"
+                android:id="@+id/votesNum"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="60"
-                android:textSize="12sp"
+                android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/imageView11"
-                android:layout_toEndOf="@+id/imageView11" />
+                android:layout_marginTop="1dp"
+                android:text="60"
+                android:textSize="14sp"
+                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/commentBtn"

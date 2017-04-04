@@ -170,6 +170,7 @@ public class SearchFragment extends Fragment {
             if(fromTag){
                 fetchQuests.whereContains("tags",tagName);
             }else{
+                srchTxt = srchTxt.substring(0, 1).toUpperCase() + srchTxt.substring(1);
                 fetchQuests.whereContains("title",srchTxt);
             }
 
@@ -324,7 +325,7 @@ public class SearchFragment extends Fragment {
 
                         }
 
-                        mGridAdapter = new CustomGridAdapter(getContext(),skillsList);
+                        mGridAdapter = new CustomGridAdapter(getContext(),skillsList,SearchFragment.this  );
 
                         tagsgv.setAdapter(mGridAdapter);
 

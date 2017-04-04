@@ -32,11 +32,15 @@ import android.widget.TextView;
 
 import com.example.joseph.queueunderflow.QuestItem;
 import com.example.joseph.queueunderflow.R;
+import com.example.joseph.queueunderflow.alerts.OthersPostAlert;
+import com.example.joseph.queueunderflow.alerts.OwnPostAlert;
 import com.example.joseph.queueunderflow.basicpost.BasicPost;
 import com.example.joseph.queueunderflow.basicpost.basicanswer.BasicAnswer;
 import com.example.joseph.queueunderflow.basicpost.basicanswer.imageanswer.ImageAnswer;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
+import com.example.joseph.queueunderflow.comments.Comment;
+import com.example.joseph.queueunderflow.comments.CommentsList;
 import com.example.joseph.queueunderflow.comments.CommentsPage;
 import com.example.joseph.queueunderflow.headquarters.QuestionsList;
 import com.example.joseph.queueunderflow.headquarters.skills.Skill;
@@ -97,9 +101,19 @@ import butterknife.BindView;
 public class PostRecycler extends RecyclerView.Adapter<PostRecycler.PhotoHolder>  {
 
     private ArrayList<BasicPost> items;
+
+    public BasicQuestion getTheQuestion() {
+        return theQuestion;
+    }
+
+    public void setTheQuestion(BasicQuestion theQuestion) {
+        this.theQuestion = theQuestion;
+    }
+
     private BasicQuestion theQuestion;
     private ArrayList<BasicAnswer> answersList;
     private ReputationFactory reputationGiver;
+    private String currUser;
 
 
 private RecyclerView postlv;
@@ -114,10 +128,13 @@ private RecyclerView postlv;
         this.theQuestion = theQuestion;
         this.mAdapter = mAdapter;
         this.answersList = new ArrayList<>();
+        this.currUser = ParseUser.getCurrentUser().getUsername();
 
 
 
     }
+
+
 
     @Override
     public int getItemViewType(int position) {
@@ -177,7 +194,8 @@ private RecyclerView postlv;
             BasicAnswer theAnswer = answersList.get(position-1);
 
 
-            holder.postOwner.setText(theAnswer.getqOwner().toString());
+            final String answerOwner = theAnswer.getqOwner().toString();
+            holder.postOwner.setText(answerOwner);
 
             String currUsr = "#";
             currUsr += ParseUser.getCurrentUser().getUsername();
@@ -232,6 +250,129 @@ private RecyclerView postlv;
             }
 
 
+            final ArrayList<String> theVoters = theQuestion.getAnswersList().get(position-1).getVoters();
+
+            boolean alreadyVoted = false;
+            for(int i=0;i<theVoters.size();i++){
+                if(theVoters.get(i).equals(ParseUser.getCurrentUser().getUsername())){
+                    alreadyVoted = true;
+                    break;
+                }
+            }
+
+            if(alreadyVoted) {
+                holder.upBtn.setVisibility(View.GONE);
+                holder.downBtn.setVisibility(View.GONE);
+                int totalVotes = theQuestion.getAnswersList().get(position-1).getVotes();
+                holder.votesNum.setText(totalVotes+"");
+                holder.votesNum.setVisibility(View.VISIBLE);
+            }else{
+
+                holder.upBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        holder.upBtn.setVisibility(View.INVISIBLE);
+                        holder.downBtn.setVisibility(View.INVISIBLE);
+                        holder.votesNum.setVisibility(View.VISIBLE);
+                        int totalVotes = theQuestion.getAnswersList().get(position-1).getVotes() + 1;
+                        theQuestion.getAnswersList().get(position-1).setVotes(totalVotes);
+                        holder.votesNum.setText("" + totalVotes);
+
+
+                        reputationGiver = new ReputationFactory(theQuestion.getAnswersList().get(position-1).getqOwner().substring(1),2);
+                        reputationGiver.giveReputation();
+
+                        ParseQuery findPost = new ParseQuery("Answers");
+                        findPost.whereEqualTo("objectId",theQuestion.getAnswersList().get(position-1).getPostId());
+                        findPost.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(java.util.List<ParseObject> objects, ParseException e) {
+
+                                if (e == null) {
+                                    for (ParseObject userData : objects) {
+
+
+                                        userData.increment("upvotes");
+                                        userData.increment("Votes");
+                                        userData.add("voters",ParseUser.getCurrentUser().getUsername());
+                                        userData.saveInBackground();
+
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+
+
+
+                holder.downBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        holder.upBtn.setVisibility(View.GONE);
+                        holder.downBtn.setVisibility(View.GONE);
+                        holder.votesNum.setVisibility(View.VISIBLE);
+                        int totalVotes = theQuestion.getAnswersList().get(position-1).getVotes() - 1;
+                        theQuestion.getAnswersList().get(position-1).setVotes(totalVotes);
+                        holder.votesNum.setText("" + totalVotes);
+                        ParseQuery findPost = new ParseQuery("Answers");
+                        findPost.whereEqualTo("objectId",theQuestion.getAnswersList().get(position-1).getPostId());
+                        findPost.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(java.util.List<ParseObject> objects, ParseException e) {
+
+                                if (e == null) {
+                                    for (ParseObject userData : objects) {
+
+
+                                        userData.increment("downvotes");
+                                        userData.increment("Votes");
+                                        userData.add("voters",ParseUser.getCurrentUser().getUsername());
+                                        userData.saveInBackground();
+
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+
+            }
+
+
+
+            holder.options.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                        if(answerOwner.equals("#" + currUser)){
+                            //Own Answer
+                            OwnPostAlert ownAnswerAlert = new OwnPostAlert(context,theQuestion.getAnswersList().get(position - 1),theQuestion.getPostId());
+                            ownAnswerAlert.show();
+                        }else{
+                            OthersPostAlert otherAlert = new OthersPostAlert(context,theQuestion.getAnswersList().get(position - 1));
+                            otherAlert.show();
+
+                        }
+
+
+
+                }
+            });
+
+
+            holder.commentBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(context, CommentsPage.class);
+                    intent.putExtra("commentList", (Serializable) theQuestion.getAnswersList().get(position-1).getCommentsList());
+                    intent.putExtra("thePostId",theQuestion.getAnswersList().get(position-1).getPostId());
+                    intent.putExtra("fromPost",1);
+                    intent.putExtra("theQuestion",theQuestion);
+                    context.startActivity(intent);
+                }
+            });
+
 
 
 
@@ -261,11 +402,104 @@ private RecyclerView postlv;
             long time = theQuestion.getPostDate().getTime();
             long now = System.currentTimeMillis();
 
-            holder.postOwner.setText(theQuestion.getqOwner().toString());
+            final String theOwner = theQuestion.getqOwner().toString();
+
+            holder.postOwner.setText(theOwner);
 
             if(theQuestion.isEdited()){
                 holder.editedText.setVisibility(View.VISIBLE);
             }
+
+            final ArrayList<String> theVoters = theQuestion.getVoters();
+
+            boolean alreadyVoted = false;
+            for(int i=0;i<theVoters.size();i++){
+                if(theVoters.get(i).equals(ParseUser.getCurrentUser().getUsername())){
+                    alreadyVoted = true;
+                    break;
+                }
+            }
+
+            if(alreadyVoted) {
+                holder.upBtn.setVisibility(View.GONE);
+                holder.downBtn.setVisibility(View.GONE);
+                int totalVotes = theQuestion.getVotes();
+                holder.votesNum.setText(totalVotes+"");
+                holder.votesNum.setVisibility(View.VISIBLE);
+            }else{
+
+                holder.upBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        holder.upBtn.setVisibility(View.INVISIBLE);
+                        holder.downBtn.setVisibility(View.INVISIBLE);
+                        holder.votesNum.setVisibility(View.VISIBLE);
+                        int totalVotes = theQuestion.getVotes() + 1;
+                        theQuestion.setVotes(totalVotes);
+                        holder.votesNum.setText("" + totalVotes);
+
+
+                        reputationGiver = new ReputationFactory(theQuestion.getqOwner().substring(1),2);
+                        reputationGiver.giveReputation();
+
+                        ParseQuery findPost = new ParseQuery("Questions");
+                        findPost.whereEqualTo("objectId",theQuestion.getPostId());
+                        findPost.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(java.util.List<ParseObject> objects, ParseException e) {
+
+                                if (e == null) {
+                                    for (ParseObject userData : objects) {
+
+
+                                        userData.increment("upvotes");
+                                        userData.increment("Votes");
+                                        userData.add("voters",ParseUser.getCurrentUser().getUsername());
+                                        userData.saveInBackground();
+
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+
+
+
+                holder.downBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        holder.upBtn.setVisibility(View.GONE);
+                        holder.downBtn.setVisibility(View.GONE);
+                        holder.votesNum.setVisibility(View.VISIBLE);
+                        int totalVotes = theQuestion.getVotes() - 1;
+                        theQuestion.setVotes(totalVotes);
+                        holder.votesNum.setText("" + totalVotes);
+                        ParseQuery findPost = new ParseQuery("Questions");
+                        findPost.whereEqualTo("objectId",theQuestion.getPostId());
+                        findPost.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(java.util.List<ParseObject> objects, ParseException e) {
+
+                                if (e == null) {
+                                    for (ParseObject userData : objects) {
+
+
+                                        userData.increment("downvotes");
+                                        userData.increment("Votes");
+                                        userData.add("voters",ParseUser.getCurrentUser().getUsername());
+                                        userData.saveInBackground();
+
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+
+            }
+
+
 
             holder.commentBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -273,6 +507,8 @@ private RecyclerView postlv;
                     Intent intent = new Intent(context, CommentsPage.class);
                     intent.putExtra("commentList", (Serializable) theQuestion.getCommentsList());
                     intent.putExtra("thePostId",theQuestion.getPostId());
+                    intent.putExtra("fromPost",0);
+                    intent.putExtra("theQuestion",theQuestion);
                     context.startActivity(intent);
                 }
             });
@@ -283,22 +519,22 @@ private RecyclerView postlv;
             holder.postDescription.setText(theQuestion.getqDescription().toString());
 
 
+
+
             holder.options.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(position == 0){
-                        if(theQuestion.getqOwner().equals("#" + ParseUser.getCurrentUser().getUsername())){
-                            editAlert(0);
-                        }else{
-                            optionAlert(theQuestion.getPostId());
-                        }
-                    }else if(position > 0){
-                        if(theQuestion.getAnswersList().get(position).getqOwner().equals(ParseUser.getCurrentUser().getUsername())){
+
+                        if(theOwner.equals("#" + currUser)){
+                            //Own Question
+                            OwnPostAlert ownQuestionAlert = new OwnPostAlert(context,theQuestion,theQuestion.getPostId());
+                            ownQuestionAlert.show();
 
                         }else{
-                            optionAlert(theQuestion.getPostId());
+                            OthersPostAlert otherAlert = new OthersPostAlert(context,theQuestion);
+                            otherAlert.show();
                         }
-                    }
+
 
 
                 }
@@ -350,6 +586,8 @@ private RecyclerView postlv;
 
 
 
+
+
     }
 
 
@@ -378,8 +616,11 @@ private RecyclerView postlv;
         TextView postOwner;
         TextView postTitle;
         TextView postDescription;
+        TextView votesNum;
         ViewPager intro_images;
         ImageView answerPicker;
+        ImageView upBtn;
+        ImageView downBtn;
         Button pickAnswerBtn;
         ImageView commentBtn;
         ImageView options;
@@ -421,9 +662,12 @@ private RecyclerView postlv;
             timeago=(TextView) v.findViewById(R.id.timeago);
             editedText=(TextView) v.findViewById(R.id.editedText);
             postTitle=(TextView) v.findViewById(R.id.postTitle);
+            votesNum=(TextView) v.findViewById(R.id.votesNum);
             pickAnswerBtn=(Button) v.findViewById(R.id.pickAnswerBtn);
             commentBtn=(ImageView) v.findViewById(R.id.commentBtn);
             answerPicker=(ImageView) v.findViewById(R.id.theAnsPick);
+            upBtn=(ImageView) v.findViewById(R.id.upBtn);
+            downBtn=(ImageView) v.findViewById(R.id.downBtn);
             options=(ImageView) v.findViewById(R.id.postOption);
             postDescription=(TextView) v.findViewById(R.id.postDescription);
             intro_images = (ViewPager) v.findViewById(R.id.pager_introduction);
@@ -698,6 +942,14 @@ private RecyclerView postlv;
         return skillImgName;
     }
 
+    public void updateComments(int fromPost, CommentsList comments,int pos){
+        if(fromPost == 0){
+            theQuestion.setCommentsList(comments);
+        }else{
+            theQuestion.getAnswersList().get(pos).setCommentsList(comments);
+        }
+    }
+
 
     public void thankYouMessage(){
         final Dialog dialog = new Dialog(context);
@@ -729,34 +981,7 @@ private RecyclerView postlv;
         dialog.show();
     }
 
-    public void editAlert(final int position){
-        final Dialog dialog = new Dialog(context);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        dialog.setContentView(R.layout.editpostdialog);
-
-        RelativeLayout flagLayout = (RelativeLayout) dialog.findViewById(R.id.editPost);
-
-        flagLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-                Intent intent = new Intent(context, SubmitQuestion.class);
-
-                if(position == 0) {
-                    intent.putExtra("editPost", theQuestion);
-                    intent.putExtra("fromActivity",2);
-                }
-
-                context.startActivity(intent);
-
-            }
-        });
-
-
-        dialog.show();
-    }
 
 
     public void confirmationAlert(final String postId){
@@ -831,4 +1056,7 @@ private RecyclerView postlv;
     }
 
 
+
+
 }
+
