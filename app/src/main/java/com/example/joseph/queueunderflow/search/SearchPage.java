@@ -57,6 +57,13 @@ public class SearchPage extends AppCompatActivity {
     private String tagName = "";
 
     @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(SearchPage.this, SearchPage.class);
+        startActivity(intent);
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_page);
@@ -136,6 +143,8 @@ public class SearchPage extends AppCompatActivity {
         tagsgv.setVisibility(View.INVISIBLE);
         questlv.setVisibility(View.INVISIBLE);
     }
+
+
 
     private class LoadQuests extends AsyncTask<Void, Void, Void> {
         @Override

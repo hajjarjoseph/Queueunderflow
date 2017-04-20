@@ -50,10 +50,14 @@ public class BasePage extends AppCompatActivity implements
     RelativeLayout contaierFrag;
 
 
+
     @BindView(R.id.bottomBar)
     BottomBar bottomBar;
 
     private int badgesNum;
+
+    private boolean inSearch = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,21 +110,26 @@ public class BasePage extends AppCompatActivity implements
                     SearchFragment newSearch = new SearchFragment();
                     ft.replace(R.id.containerFrag, newSearch);
                     ft.commit();
+                    inSearch = true;
                 }else if(tabId == R.id.tab_profile){
                     final  FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     ProfilePage newProfile = new ProfilePage();
                     ft.replace(R.id.containerFrag, newProfile);
                     ft.commit();
+                    inSearch = false;
                 } else if(tabId == R.id.tab_feed){
                     final  FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     FeedPage newFeed = new FeedPage();
                     ft.replace(R.id.containerFrag, newFeed );
                     ft.commit();
+                    inSearch = false;
                 }else if(tabId == R.id.tab_notifications){
                     final  FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     NotificationPage newsFeed = new NotificationPage();
                     ft.replace(R.id.containerFrag, newsFeed );
                     ft.commit();
+
+                    inSearch = false;
 
                     if(badgesNum > 0){
                         Map<String,Object> params = new HashMap<String,Object>();
@@ -167,18 +176,8 @@ public class BasePage extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
 
-        int count = getFragmentManager().getBackStackEntryCount();
-
-        if (count == 0) {
-            super.onBackPressed();
-            //additional code
-        } else {
-
-
-            getFragmentManager().popBackStack();
-
-
-
+        if(inSearch){
+            
         }
 
     }

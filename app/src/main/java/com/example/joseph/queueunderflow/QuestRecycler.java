@@ -40,6 +40,7 @@ import com.example.joseph.queueunderflow.headquarters.queuebuilder.QueueBuilder;
 import com.example.joseph.queueunderflow.headquarters.skills.Skill;
 import com.example.joseph.queueunderflow.home.BasePage;
 import com.example.joseph.queueunderflow.home.FeedPage;
+import com.example.joseph.queueunderflow.profile.ProfileActivity;
 import com.example.joseph.queueunderflow.reputation.ReputationFactory;
 import com.example.joseph.queueunderflow.search.SearchPage;
 import com.example.joseph.queueunderflow.submitpost.SubmitQuestion;
@@ -119,6 +120,22 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
 
             holder.skillName1.setText(tag);
 
+            holder.userqItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(context, ProfileActivity.class);
+                    /*
+                    ArrayList<BasicPost> newItems = new ArrayList<BasicPost>();
+                    newItems.add(items.get(position));
+                    */
+
+
+                    intent.putExtra("theUser",item.getqOwner().substring(1));
+                    context.startActivity(intent);
+
+
+                }
+            });
             String  skillDraw = nametoDrawable(tag);
 
 
@@ -246,6 +263,21 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
                 }
             });
 
+            holder.shareBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+                    emailIntent.setType("application/image");
+                    emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{""});
+                    emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,"Can you help answer this question? Owly");
+                    emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,((BasicQuestion)items.get(position)).getqTitle()+" \n\n " + items.get(position).getqDescription());
+                    if(items.get(position) instanceof ImageQuestion){
+                        emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(((ImageQuestion) items.get(position)).getImagesUri().get(0)));
+                    }
+
+                    context.startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+                }
+            });
 
             holder.cardBox.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -291,6 +323,7 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
         ImageView upBtn;
         ImageView downBtn;
         ImageView optionBtn;
+        ImageView shareBtn;
         RelativeLayout cardBox;
         TextView timeAgo;
         RoundCornerProgressBar upPrg;
@@ -320,6 +353,7 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
             downBtn=(ImageView) v.findViewById(R.id.downBtn);
             optionBtn=(ImageView) v.findViewById(R.id.optionBtn);
             cardBox=(RelativeLayout) v.findViewById(R.id.cardBox);
+            shareBtn=(ImageView) v.findViewById(R.id.shareBtn);
             timeAgo = (TextView ) v.findViewById(R.id.timestamp);
             upPrg = (RoundCornerProgressBar ) v.findViewById(R.id.upPrg);
 

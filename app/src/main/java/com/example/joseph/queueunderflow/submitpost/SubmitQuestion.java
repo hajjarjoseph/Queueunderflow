@@ -311,6 +311,25 @@ private BasicQuestion question;
                     }else if(descriptionPick.getText().toString().isEmpty()){
                         createAlert("Description Field cannot be empty!");
                     }else{
+
+                        ParseQuery incrementUsrers = new ParseQuery("Numbers");
+                        incrementUsrers.whereEqualTo("objectId","AI9X0DPPfe");
+                        incrementUsrers.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(java.util.List<ParseObject> objects, ParseException e) {
+                                if (e == null) {
+                                    for (ParseObject userData : objects) {
+
+                                        userData.increment("questionsNum");
+                                        userData.saveInBackground();
+
+
+
+                                    }
+                                }
+                            }
+                        });
+
                         createLoading();
                         String title = titlePick.getText().toString();
                         String description = descriptionPick.getText().toString();

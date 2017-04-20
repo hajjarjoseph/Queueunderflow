@@ -35,12 +35,18 @@ public class InterestPage extends AppCompatActivity {
     ImageButton backButton;
     @BindView(R.id.interestlv)
     RecyclerView interestlv;
+    private String theUser = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_interest_page);
         ButterKnife.bind(this);
 
+        Bundle extras = getIntent().getExtras();
+
+        if (extras != null) {
+            theUser = extras.getString("theUser");
+        }
 
         mLinearLayoutManager = new LinearLayoutManager(this);
         interestlv.setLayoutManager(mLinearLayoutManager);
@@ -65,7 +71,12 @@ public class InterestPage extends AppCompatActivity {
             skills = new ArrayList<>();
 
             ParseQuery fetchSkillsL = new ParseQuery("_User");
-            fetchSkillsL.whereEqualTo("username", ParseUser.getCurrentUser().getUsername());
+            if(!theUser.isEmpty()){
+                fetchSkillsL.whereEqualTo("username", ParseUser.getCurrentUser().getUsername());
+            }else{
+                fetchSkillsL.whereEqualTo("username", theUser);
+            }
+
 
 
             fetchSkillsL.findInBackground(new FindCallback<ParseObject>() {

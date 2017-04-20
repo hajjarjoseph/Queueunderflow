@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.example.joseph.queueunderflow.MainActivity;
 import com.example.joseph.queueunderflow.R;
+import com.example.joseph.queueunderflow.authentication.verification.VerificationPage;
 import com.example.joseph.queueunderflow.headquarters.MainPage;
 import com.example.joseph.queueunderflow.home.BasePage;
 import com.example.joseph.queueunderflow.selectiontopic.SelectTopicPage;
@@ -118,6 +119,7 @@ public class CreateAccount extends AppCompatActivity {
                     user.put("skills",emptyArr);
                     user.put("subscribedPosts",emptyArr);
                     user.put("notifications",emptyArr);
+                    user.put("emailVerified",false);
 
 
 
@@ -196,8 +198,8 @@ public class CreateAccount extends AppCompatActivity {
                                                                          }
                                                                      }
                                                                  });
-                                Intent intent = new Intent(mContext, SelectTopicPage.class);
-                                intent.putExtra("firstTime",true);
+                                Intent intent = new Intent(mContext, VerificationPage.class);
+
                                 signDialog.dismiss();
                                 startActivity(intent);
                             }else{

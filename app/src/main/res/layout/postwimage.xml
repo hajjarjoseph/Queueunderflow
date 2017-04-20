@@ -139,7 +139,7 @@
                 android:src="@drawable/commentbut" />
 
             <ImageView
-                android:id="@+id/imageView14"
+                android:id="@+id/shareBtn"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_alignParentEnd="true"

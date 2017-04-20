@@ -35,6 +35,16 @@ public class ParseTransaction {
     private Context context;
     private QuestRecycler mAdapter;
 
+    public String getTheUser() {
+        return theUser;
+    }
+
+    public void setTheUser(String theUser) {
+        this.theUser = theUser;
+    }
+
+    private String theUser;
+
     private ArrayList<String> userTopics;
 
     public ParseTransaction(){
@@ -89,7 +99,7 @@ public class ParseTransaction {
              if(switcher == 2){
                 fetchQuests.whereEqualTo("owner", ParseUser.getCurrentUser().getUsername());
             }else if(switcher == 3){
-
+                 fetchQuests.whereEqualTo("owner", theUser);
             }
             findQuestsBackground(fetchQuests,widgi);
         }

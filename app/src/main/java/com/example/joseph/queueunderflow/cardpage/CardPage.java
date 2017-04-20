@@ -81,6 +81,14 @@ public class CardPage extends AppCompatActivity  {
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
 
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(CardPage.this, BasePage.class);
+                startActivity(intent);
+            }
+        });
+
 
         Bundle extras = getIntent().getExtras();
 

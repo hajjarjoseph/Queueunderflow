@@ -71,6 +71,7 @@ import com.example.joseph.queueunderflow.headquarters.QuestionsList;
 import com.example.joseph.queueunderflow.headquarters.queuebuilder.QueueBuilder;
 import com.example.joseph.queueunderflow.headquarters.skills.Skill;
 import com.example.joseph.queueunderflow.headquarters.skills.SkillsRecycler;
+import com.example.joseph.queueunderflow.profile.ProfileActivity;
 import com.example.joseph.queueunderflow.reputation.ReputationFactory;
 import com.example.joseph.queueunderflow.submitpost.SubmitQuestion;
 import com.example.joseph.queueunderflow.viewpager.ViewPagerAdapter;
@@ -279,6 +280,10 @@ private RecyclerView postlv;
                         holder.votesNum.setText("" + totalVotes);
 
 
+
+
+
+
                         reputationGiver = new ReputationFactory(theQuestion.getAnswersList().get(position-1).getqOwner().substring(1),2);
                         reputationGiver.giveReputation();
 
@@ -294,6 +299,9 @@ private RecyclerView postlv;
 
                                         userData.increment("upvotes");
                                         userData.increment("Votes");
+                                       ArrayList<String> votez = (ArrayList<String>) userData.get("voters");
+                                        votez.add(ParseUser.getCurrentUser().getUsername());
+                                        theQuestion.getAnswersList().get(position-1).setVoters(votez);
                                         userData.add("voters",ParseUser.getCurrentUser().getUsername());
                                         userData.saveInBackground();
 
@@ -327,6 +335,9 @@ private RecyclerView postlv;
 
                                         userData.increment("downvotes");
                                         userData.increment("Votes");
+                                        ArrayList<String> votez = (ArrayList<String>) userData.get("voters");
+                                        votez.add(ParseUser.getCurrentUser().getUsername());
+                                        theQuestion.getAnswersList().get(position-1).setVoters(votez);
                                         userData.add("voters",ParseUser.getCurrentUser().getUsername());
                                         userData.saveInBackground();
 
@@ -373,6 +384,19 @@ private RecyclerView postlv;
                 }
             });
 
+            holder.postOwner.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(context, ProfileActivity.class);
+                    /*
+                    ArrayList<BasicPost> newItems = new ArrayList<BasicPost>();
+                    newItems.add(items.get(position));
+                    */
+                    intent.putExtra("theUser",answerOwner.substring(1));
+                    context.startActivity(intent);
+                }
+            });
+
 
 
 
@@ -390,6 +414,26 @@ private RecyclerView postlv;
             }
 
 
+            holder.shareBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+                    emailIntent.setType("application/image");
+                    emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{""});
+                    emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,"Sharing with you an answer for a question on Owly");
+
+                    if(theQuestion.getAnswersList().get(position-1) instanceof ImageAnswer){
+                        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,"Question: " + theQuestion.getqTitle() + "\n\n Answer: " + theQuestion.getAnswersList().get(position-1).getqDescription() +  Uri.parse(((ImageAnswer) theQuestion.getAnswersList().get(position-1)).getImagesUri().get(0)) + "\n\n What do you think ?");
+
+                    }else{
+                        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,"Question: " + theQuestion.getqTitle() + "\n\n Answer: " + theQuestion.getAnswersList().get(position-1).getqDescription() + "\n\n + What do you think ?");
+                    }
+
+                    context.startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+                }
+            });
+
+
 
             holder.setUiPageViewController();
 
@@ -403,6 +447,39 @@ private RecyclerView postlv;
             long now = System.currentTimeMillis();
 
             final String theOwner = theQuestion.getqOwner().toString();
+
+            holder.postOwner.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(context, ProfileActivity.class);
+                    /*
+                    ArrayList<BasicPost> newItems = new ArrayList<BasicPost>();
+                    newItems.add(items.get(position));
+                    */
+
+
+                    intent.putExtra("theUser",theOwner.substring(1));
+                    context.startActivity(intent);
+                }
+            });
+
+            holder.shareBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+                    emailIntent.setType("application/image");
+                    emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{""});
+                    emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,"Can you help answer this question? Owly");
+
+                    if(theQuestion instanceof ImageQuestion){
+                        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,(theQuestion.getqTitle()+" \n\n " + theQuestion.getqDescription() + "\n\n " + Uri.parse(((ImageQuestion) theQuestion).getImagesUri().get(0).toString())));
+                    }else{
+                        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,(theQuestion.getqTitle()+" \n\n " + theQuestion.getqDescription()));
+                    }
+
+                    context.startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+                }
+            });
 
             holder.postOwner.setText(theOwner);
 
@@ -621,6 +698,7 @@ private RecyclerView postlv;
         ImageView answerPicker;
         ImageView upBtn;
         ImageView downBtn;
+        ImageView shareBtn;
         Button pickAnswerBtn;
         ImageView commentBtn;
         ImageView options;
@@ -668,6 +746,7 @@ private RecyclerView postlv;
             answerPicker=(ImageView) v.findViewById(R.id.theAnsPick);
             upBtn=(ImageView) v.findViewById(R.id.upBtn);
             downBtn=(ImageView) v.findViewById(R.id.downBtn);
+            shareBtn=(ImageView) v.findViewById(R.id.shareBtn);
             options=(ImageView) v.findViewById(R.id.postOption);
             postDescription=(TextView) v.findViewById(R.id.postDescription);
             intro_images = (ViewPager) v.findViewById(R.id.pager_introduction);
@@ -862,7 +941,7 @@ private RecyclerView postlv;
                 theQuestion.setAnswersId(ansIds);
 
 
-                reputationGiver = new ReputationFactory(theQuestion.getAnswersList().get(pos-1).getqOwner().substring(1),5);
+                reputationGiver = new ReputationFactory(theQuestion.getAnswersList().get(pos).getqOwner().substring(1),5);
                 reputationGiver.giveReputation();
 
                 ParseQuery query = new ParseQuery("Questions");

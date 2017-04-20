@@ -16,6 +16,8 @@ import com.example.joseph.queueunderflow.R;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.cardpage.CardPage;
 import com.example.joseph.queueunderflow.cardpage.PostRecycler;
+import com.example.joseph.queueunderflow.home.BasePage;
+import com.example.joseph.queueunderflow.home.FeedPage;
 import com.example.joseph.queueunderflow.submitpost.SubmitQuestion;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -133,12 +135,7 @@ public class CommentsPage extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(CommentsPage.this, CardPage.class);
-
-        intent.putExtra("postDetail",theQuestion);
-
-
-
+        Intent intent = new Intent(CommentsPage.this, BasePage.class);
         startActivity(intent);
     }
 

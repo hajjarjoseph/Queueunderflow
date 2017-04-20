@@ -87,7 +87,8 @@
         <activity android:name=".reset.ResetPage" />
         <activity android:name=".selectiontopic.SelectTopicPage" />
         <activity android:name=".interest.InterestPage" />
-        <activity android:name=".profile.ProfileActivity"></activity>
+        <activity android:name=".profile.ProfileActivity" />
+        <activity android:name=".authentication.verification.VerificationPage"></activity>
     </application>
 
 </manifest>
