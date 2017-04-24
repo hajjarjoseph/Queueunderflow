@@ -267,7 +267,7 @@ public class SearchFragment extends Fragment {
                             questlv.setVisibility(View.VISIBLE);
                             searchPg.setVisibility(View.INVISIBLE);
                         }else if(fromTag == true){
-                            questlv.setVisibility(View.VISIBLE);
+                             questlv.setVisibility(View.VISIBLE);
                             searchPg.setVisibility(View.INVISIBLE);
                         }
 

@@ -3,62 +3,39 @@ package com.example.joseph.queueunderflow;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.net.Uri;
-import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.NoAnimation;
 import com.example.joseph.queueunderflow.alerts.OthersPostAlert;
 import com.example.joseph.queueunderflow.alerts.OwnPostAlert;
-import com.example.joseph.queueunderflow.authentication.IntroPage;
-import com.example.joseph.queueunderflow.authentication.askquestion.AskQuestionMain;
 import com.example.joseph.queueunderflow.basicpost.BasicPost;
-import com.example.joseph.queueunderflow.basicpost.basicanswer.BasicAnswer;
-import com.example.joseph.queueunderflow.basicpost.basicanswer.imageanswer.ImageAnswer;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
-import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
 import com.example.joseph.queueunderflow.cardpage.CardPage;
-import com.example.joseph.queueunderflow.headquarters.MainPage;
-import com.example.joseph.queueunderflow.headquarters.QuestionsList;
-import com.example.joseph.queueunderflow.headquarters.queuebuilder.QueueBuilder;
 import com.example.joseph.queueunderflow.headquarters.skills.Skill;
 import com.example.joseph.queueunderflow.home.BasePage;
-import com.example.joseph.queueunderflow.home.FeedPage;
 import com.example.joseph.queueunderflow.profile.ProfileActivity;
 import com.example.joseph.queueunderflow.reputation.ReputationFactory;
-import com.example.joseph.queueunderflow.search.SearchPage;
-import com.example.joseph.queueunderflow.submitpost.SubmitQuestion;
-import com.github.curioustechizen.ago.RelativeTimeTextView;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.parse.FindCallback;
-import com.parse.FunctionCallback;
-import com.parse.ParseCloud;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -98,7 +75,7 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
     @Override
     public QuestRecycler.PhotoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View inflatedView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.questitem, parent, false);
+                .inflate(R.layout.newfeedlayout, parent, false);
         return new PhotoHolder(inflatedView);
     }
 
@@ -114,6 +91,50 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
         holder.userqItem.setText(item.getqOwner());
 
         ArrayList<String> tags = ((BasicQuestion) item).getTags();
+
+
+        ParseQuery fetchUser = new ParseQuery("_User");
+        fetchUser.whereEqualTo("username", item.getqOwner().substring(1));
+
+        fetchUser.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(java.util.List<ParseObject> objects, ParseException e) {
+                if (e == null) {
+                    for (ParseObject profileData : objects) {
+
+
+                      ParseFile  proImg = (ParseFile) profileData.get("profilePicture");
+
+                        if (proImg == null) {
+                           holder.profilePic.setImageResource(R.drawable.miniowl);
+                        } else {
+                           String imgUrl = proImg.getUrl();
+                            Uri imgUri = Uri.parse(imgUrl);
+
+                            Glide
+                                    .with(context)
+                                    .load(imgUri)
+                                    .into(holder.profilePic);
+
+
+                        }
+                    }
+                }
+            }
+        });
+
+/*
+        if(!item.getProUrl().equals("")){
+            Uri imgUri = Uri.parse(item.getProUrl());
+            Glide
+                    .with(context)
+                    .load(imgUri)
+                    .into(holder.profilePic);
+        }else{
+            holder.profilePic.setImageResource(R.drawable.miniowl);
+        }
+        */
+
 
         if(!tags.isEmpty()){
             String tag = tags.get(0);
@@ -150,22 +171,64 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
             }
 
             if(alreadyVoted){
-                holder.upBtn.setVisibility(View.GONE);
-                holder.downBtn.setVisibility(View.GONE);
+
+                final ArrayList<String> upVoters = items.get(position).getUpVoters();
+               // final ArrayList<String> downVoters = items.get(position).getVoters();
+
+                boolean upVoted = false;
+                for(int i=0;i<upVoters.size();i++){
+                    if(upVoters.get(i).equals(ParseUser.getCurrentUser().getUsername())){
+                        upVoted = true;
+                        break;
+                    }
+                }
+                if(upVoted){
+                    holder.upBtn.setImageResource(R.drawable.up_arrow_selected);
+                }else{
+                    holder.downBtn.setImageResource(R.drawable.down_arrow_selected);
+                }
+
+
 
             }else {
                 holder.upBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        holder.upBtn.setVisibility(View.GONE);
-                        holder.downBtn.setVisibility(View.GONE);
+                        holder.upBtn.setImageResource(R.drawable.up_arrow_selected);
                         int totalVotes = items.get(position).getVotes() + 1;
+                        int upVotes = items.get(position).getUpVotes() + 1;
+
+
                         items.get(position).setVotes(totalVotes);
+                        items.get(position).setUpVotes(upVotes );
                         holder.votesNum.setText("" + totalVotes);
 
 
+                        final ArrayList<String> upVoters = items.get(position).getVoters();
+
+                        theVoters.add(ParseUser.getCurrentUser().getUsername());
+                        upVoters.add(ParseUser.getCurrentUser().getUsername());
+                        item.setVoters(theVoters);
+                        item.setUpVoters(upVoters);
+
+                        items.set(position,item);
+
                         reputationGiver = new ReputationFactory(items.get(position).getqOwner().substring(1),2);
                         reputationGiver.giveReputation();
+
+                        holder.upBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                            }
+                        });
+
+                        holder.downBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                            }
+                        });
 
                         ParseQuery findPost = new ParseQuery("Questions");
                         findPost.whereEqualTo("objectId",items.get(position).getPostId());
@@ -180,6 +243,7 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
                                         userData.increment("upvotes");
                                         userData.increment("Votes");
                                         userData.add("voters",ParseUser.getCurrentUser().getUsername());
+                                        userData.add("upvoters",ParseUser.getCurrentUser().getUsername());
                                         userData.saveInBackground();
 
                                     }
@@ -193,11 +257,41 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
                 holder.downBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        holder.upBtn.setVisibility(View.GONE);
-                        holder.downBtn.setVisibility(View.GONE);
+
+                        holder.downBtn.setImageResource(R.drawable.down_arrow_selected);
                         int totalVotes = items.get(position).getVotes() - 1;
-                         items.get(position).setVotes(totalVotes);
+                        int downVotes = items.get(position).getDownVotes() + 1;
+
+
+                        items.get(position).setVotes(totalVotes);
+                        items.get(position).setDownVotes(downVotes);
                         holder.votesNum.setText("" + totalVotes);
+
+
+
+                        final ArrayList<String> downVoters = items.get(position).getDownVoters();
+
+                        theVoters.add(ParseUser.getCurrentUser().getUsername());
+                        downVoters.add(ParseUser.getCurrentUser().getUsername());
+                        item.setVoters(theVoters);
+                        item.setUpVoters(downVoters);
+
+                        items.set(position,item);
+
+
+                        holder.upBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                            }
+                        });
+
+                        holder.downBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                            }
+                        });
                         ParseQuery findPost = new ParseQuery("Questions");
                         findPost.whereEqualTo("objectId",items.get(position).getPostId());
                         findPost.findInBackground(new FindCallback<ParseObject>() {
@@ -211,6 +305,7 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
                                         userData.increment("downvotes");
                                         userData.increment("Votes");
                                         userData.add("voters",ParseUser.getCurrentUser().getUsername());
+                                        userData.add("downvoters",ParseUser.getCurrentUser().getUsername());
                                         userData.saveInBackground();
 
                                     }
@@ -263,6 +358,7 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
                 }
             });
 
+            /*
             holder.shareBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -278,6 +374,8 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
                     context.startActivity(Intent.createChooser(emailIntent, "Send mail..."));
                 }
             });
+
+            */
 
             holder.cardBox.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -323,6 +421,7 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
         ImageView upBtn;
         ImageView downBtn;
         ImageView optionBtn;
+        CircularImageView profilePic;
         ImageView shareBtn;
         RelativeLayout cardBox;
         TextView timeAgo;
@@ -344,18 +443,20 @@ public class QuestRecycler extends RecyclerView.Adapter<QuestRecycler.PhotoHolde
 
 
 
-            userqItem=(TextView) v.findViewById(R.id.userqItem);
-            titleqItem=(TextView) v.findViewById(R.id.titleqItem);
+            userqItem=(TextView) v.findViewById(R.id.postOwner);
+            titleqItem=(TextView) v.findViewById(R.id.postTitle);
             skillName1=(TextView) v.findViewById(R.id.skillNameqItem1);
             votesNum=(TextView) v.findViewById(R.id.votesNum);
             skillPic1=(ImageView) v.findViewById(R.id.skillPicqItem1);
             upBtn=(ImageView) v.findViewById(R.id.upBtn);
             downBtn=(ImageView) v.findViewById(R.id.downBtn);
-            optionBtn=(ImageView) v.findViewById(R.id.optionBtn);
+            optionBtn=(ImageView) v.findViewById(R.id.postOption);
+            profilePic=(CircularImageView) v.findViewById(R.id.profilePic);
             cardBox=(RelativeLayout) v.findViewById(R.id.cardBox);
-            shareBtn=(ImageView) v.findViewById(R.id.shareBtn);
+
+            //shareBtn=(ImageView) v.findViewById(R.id.shareBtn);
             timeAgo = (TextView ) v.findViewById(R.id.timestamp);
-            upPrg = (RoundCornerProgressBar ) v.findViewById(R.id.upPrg);
+            //upPrg = (RoundCornerProgressBar ) v.findViewById(R.id.upPrg);
 
 
 

@@ -112,7 +112,7 @@ public class ParseTransaction {
             @Override
             public void done(java.util.List<ParseObject> objects, ParseException e) {
                 if (e == null) {
-                    for (ParseObject userData : objects) {
+                    for (final ParseObject userData : objects) {
 
 
 
@@ -128,15 +128,15 @@ public class ParseTransaction {
                         int upVotes = userData.getInt("upvotes");
                         int downVotes = userData.getInt("downvotes");
 
-                        ArrayList<HashMap<String,String>> commentListArr = (ArrayList<HashMap<String,String>>) userData.get("comments");
+                        ArrayList<HashMap<String, String>> commentListArr = (ArrayList<HashMap<String, String>>) userData.get("comments");
                         ArrayList<Comment> theList = new ArrayList<Comment>();
                         HashMap<String, String> commentList = new HashMap<String, String>();
-                        if(commentListArr.size()>0) {
+                        if (commentListArr.size() > 0) {
 
-                            for(int i=0;i<commentListArr.size();i++){
+                            for (int i = 0; i < commentListArr.size(); i++) {
                                 commentList = commentListArr.get(i);
-                                Map.Entry<String,String> entry=commentList.entrySet().iterator().next();
-                                Comment c = new Comment(entry.getKey(),entry.getValue());
+                                Map.Entry<String, String> entry = commentList.entrySet().iterator().next();
+                                Comment c = new Comment(entry.getKey(), entry.getValue());
                                 theList.add(c);
 
                             }
@@ -145,9 +145,10 @@ public class ParseTransaction {
                         CommentsList finalCom = new CommentsList(theList);
 
 
-
-
                         ArrayList<String> voters = (ArrayList<String>) userData.get("voters");
+                        ArrayList<String> upVoters = (ArrayList<String>) userData.get("upvoters");
+                        ArrayList<String> downVoters = (ArrayList<String>) userData.get("downvoters");
+
                         ArrayList<String> tags = (ArrayList<String>) userData.get("tags");
                         ArrayList<String> answersId = (ArrayList<String>) userData.get("answers");
 
@@ -155,18 +156,22 @@ public class ParseTransaction {
                         ArrayList<String> images = new ArrayList<String>();
 
                         ParseFile qImage = (ParseFile) userData.get("image1");
-                        if(qImage == null){
+                        if (qImage == null) {
 
                             // Create BasicQuestion with no images
-                            BasicQuestion basicQuestion = new BasicQuestion(owner,title,description,postId,postDate,voters,tags,answersId);
+                            BasicQuestion basicQuestion = new BasicQuestion(owner, title, description, postId, postDate, voters, tags, answersId);
                             basicQuestion.setHasAnswer(hasAnswer);
                             basicQuestion.setEdited(edited);
-                            basicQuestion.setVotes(upVotes-downVotes);
+                            basicQuestion.setVotes(upVotes - downVotes);
                             basicQuestion.setCommentsList(finalCom);
+                            basicQuestion.setUpVoters(upVoters);
+                            basicQuestion.setDownVoters(downVoters);
+                            basicQuestion.setUpVotes(upVotes);
+                            basicQuestion.setDownVotes(downVotes);
                             items.add(basicQuestion);
 
-                        }else{
-                            String imageUrl = qImage.getUrl() ;//live url
+                        } else {
+                            String imageUrl = qImage.getUrl();//live url
 
 
                             images.add(imageUrl);
@@ -174,10 +179,10 @@ public class ParseTransaction {
 
                             qImage = (ParseFile) userData.get("image2");
 
-                            if(qImage == null){
+                            if (qImage == null) {
                                 //Do nothing
-                            }else{
-                                imageUrl = qImage.getUrl() ;//live url
+                            } else {
+                                imageUrl = qImage.getUrl();//live url
 
 
                                 images.add(imageUrl);
@@ -185,10 +190,10 @@ public class ParseTransaction {
 
                                 qImage = (ParseFile) userData.get("image3");
 
-                                if(qImage == null){
+                                if (qImage == null) {
 
-                                }else{
-                                    imageUrl = qImage.getUrl() ;//live url
+                                } else {
+                                    imageUrl = qImage.getUrl();//live url
 
                                     images.add(imageUrl);
                                 }
@@ -197,18 +202,23 @@ public class ParseTransaction {
                             }
 
                             //Create ImageQuestion
-                            ImageQuestion imageQuestion = new ImageQuestion(owner,title,description,postId,postDate,tags,answersId,images,voters);
+                            ImageQuestion imageQuestion = new ImageQuestion(owner, title, description, postId, postDate, tags, answersId, images, voters);
                             imageQuestion.setHasAnswer(hasAnswer);
                             imageQuestion.setEdited(edited);
-                            imageQuestion.setVotes(upVotes-downVotes);
+                            imageQuestion.setVotes(upVotes - downVotes);
                             imageQuestion.setCommentsList(finalCom);
+                            imageQuestion.setUpVoters(upVoters);
+                            imageQuestion.setDownVoters(downVoters);
+                            imageQuestion.setUpVotes(upVotes);
+                            imageQuestion.setDownVotes(downVotes);
                             items.add(imageQuestion);
                         }
 
                     }
 
-                    mAdapter = new QuestRecycler(widgi.getContext(),items);
+                    mAdapter = new QuestRecycler(widgi.getContext(), items);
                     widgi.setAdapter(mAdapter);
+
 
 
 

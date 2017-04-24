@@ -350,6 +350,9 @@ public class ProfilePage extends Fragment {
 
 
                                             ArrayList<String> voters = (ArrayList<String>) userData.get("voters");
+                                            ArrayList<String> upVoters = (ArrayList<String>) userData.get("upvoters");
+                                            ArrayList<String> downVoters = (ArrayList<String>) userData.get("downvoters");
+
                                             ArrayList<String> tags = (ArrayList<String>) userData.get("tags");
                                             ArrayList<String> answersId = (ArrayList<String>) userData.get("answers");
 
@@ -364,6 +367,8 @@ public class ProfilePage extends Fragment {
                                                 basicQuestion.setHasAnswer(hasAnswer);
                                                 basicQuestion.setEdited(edited);
                                                 basicQuestion.setVotes(upVotes-downVotes);
+                                                basicQuestion.setUpVoters(upVoters);
+                                                basicQuestion.setDownVoters(downVoters);
                                                 basicQuestion.setCommentsList(finalCom);
                                                 items2.add(basicQuestion);
 
@@ -404,6 +409,8 @@ public class ProfilePage extends Fragment {
                                                 imageQuestion.setEdited(edited);
                                                 imageQuestion.setVotes(upVotes-downVotes);
                                                 imageQuestion.setCommentsList(finalCom);
+                                                imageQuestion.setUpVoters(upVoters);
+                                                imageQuestion.setDownVoters(downVoters);
                                                 items2.add(imageQuestion);
                                             }
 

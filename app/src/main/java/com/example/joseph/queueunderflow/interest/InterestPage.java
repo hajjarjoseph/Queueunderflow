@@ -46,6 +46,8 @@ public class InterestPage extends AppCompatActivity {
 
         if (extras != null) {
             theUser = extras.getString("theUser");
+        }else {
+            theUser = ParseUser.getCurrentUser().getUsername();
         }
 
         mLinearLayoutManager = new LinearLayoutManager(this);

@@ -352,6 +352,8 @@ private BasicQuestion question;
                         post.put("upvotes",0);
                         post.put("downvotes",0);
                         post.put("voters",emptyStr);
+                        post.put("upvoters",emptyStr);
+                        post.put("downvoters",emptyStr);
                         post.put("comments",emptyStr);
 
                         bindImgs(post);
@@ -534,6 +536,8 @@ private BasicQuestion question;
                          newAnswer.put("upvotes",0);
                          newAnswer.put("downvotes",0);
                          newAnswer.put("voters",emptyStr);
+                         newAnswer.put("upvoters",emptyStr);
+                         newAnswer.put("downvoters",emptyStr);
                          newAnswer  .put("comments",emptyStr);
                          bindImgs(newAnswer);
 

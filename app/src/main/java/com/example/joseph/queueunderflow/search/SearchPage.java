@@ -19,6 +19,8 @@ import com.example.joseph.queueunderflow.R;
 import com.example.joseph.queueunderflow.basicpost.BasicPost;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.BasicQuestion;
 import com.example.joseph.queueunderflow.basicpost.basicquestion.imagequestion.ImageQuestion;
+import com.example.joseph.queueunderflow.comments.Comment;
+import com.example.joseph.queueunderflow.comments.CommentsList;
 import com.example.joseph.queueunderflow.headquarters.QuestionsList;
 import com.example.joseph.queueunderflow.home.BasePage;
 import com.example.joseph.queueunderflow.home.FeedPage;
@@ -32,6 +34,8 @@ import com.roughike.bottombar.OnTabSelectListener;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,6 +59,9 @@ public class SearchPage extends AppCompatActivity {
     private String srchTxt="";
     private boolean fromTag = false;
     private String tagName = "";
+
+    private ParseFile proImg;
+    private String imgUrl;
 
     @Override
     public void onBackPressed() {
@@ -165,98 +172,161 @@ public class SearchPage extends AppCompatActivity {
                 @Override
                 public void done(java.util.List<ParseObject> objects, ParseException e) {
                     if (e == null) {
-                        for (ParseObject userData : objects) {
-
-                            String title = userData.getString("title");
-                            String owner = "#";
-                            owner += userData.getString("owner");
-                            String description = userData.getString("description");
-                            Date postDate = userData.getCreatedAt();
-                            String postId = userData.getObjectId();
-                            boolean hasAnswer = userData.getBoolean("hasAnswer");
-                            boolean edited = userData.getBoolean("edited");
-                            int votes = userData.getInt("Votes");
-                            int upVotes = userData.getInt("upvotes");
-                            int downVotes = userData.getInt("downvotes");
-
-                            ArrayList<String> voters = (ArrayList<String>) userData.get("voters");
-                            ArrayList<String> tags = (ArrayList<String>) userData.get("tags");
-                            ArrayList<String> answersId = (ArrayList<String>) userData.get("answers");
+                        for (final ParseObject userData : objects) {
 
 
-                            ArrayList<String> images = new ArrayList<String>();
+                            String owners = userData.getString("owner");
 
-                            ParseFile qImage = (ParseFile) userData.get("image1");
-                            if(qImage == null){
+                            ParseQuery fetchUser = new ParseQuery("_User");
+                            fetchUser.whereEqualTo("username", owners);
 
-                                // Create BasicQuestion with no images
-                                BasicQuestion basicQuestion = new BasicQuestion(owner,title,description,postId,postDate,voters,tags,answersId);
-                                basicQuestion.setHasAnswer(hasAnswer);
-                                basicQuestion.setEdited(edited);
-                                basicQuestion.setVotes(upVotes-downVotes);
-                                items.add(basicQuestion);
-
-                            }else{
-                                String imageUrl = qImage.getUrl() ;//live url
+                            fetchUser.findInBackground(new FindCallback<ParseObject>() {
+                                @Override
+                                public void done(java.util.List<ParseObject> objects, ParseException e) {
+                                    if (e == null) {
+                                        for (ParseObject profileData : objects) {
 
 
-                                images.add(imageUrl);
+                                            proImg = (ParseFile) profileData.get("profilePicture");
+
+                                            if (proImg == null) {
+                                                imgUrl = "";
+                                            } else {
+                                                imgUrl = proImg.getUrl();
 
 
-                                qImage = (ParseFile) userData.get("image2");
+                                            }
+                                        }
 
-                                if(qImage == null){
-                                    //Do nothing
-                                }else{
-                                    imageUrl = qImage.getUrl() ;//live url
+                                        String title = userData.getString("title");
+                                        String owner= "#";
+                                        owner += userData.getString("owner");
+                                        String description = userData.getString("description");
+                                        Date postDate = userData.getCreatedAt();
+                                        String postId = userData.getObjectId();
+                                        boolean hasAnswer = userData.getBoolean("hasAnswer");
+                                        boolean edited = userData.getBoolean("edited");
+                                        int votes = userData.getInt("Votes");
+                                        int upVotes = userData.getInt("upvotes");
+                                        int downVotes = userData.getInt("downvotes");
+
+                                        ArrayList<HashMap<String, String>> commentListArr = (ArrayList<HashMap<String, String>>) userData.get("comments");
+                                        ArrayList<Comment> theList = new ArrayList<Comment>();
+                                        HashMap<String, String> commentList = new HashMap<String, String>();
+                                        if (commentListArr.size() > 0) {
+
+                                            for (int i = 0; i < commentListArr.size(); i++) {
+                                                commentList = commentListArr.get(i);
+                                                Map.Entry<String, String> entry = commentList.entrySet().iterator().next();
+                                                Comment c = new Comment(entry.getKey(), entry.getValue());
+                                                theList.add(c);
+
+                                            }
+                                        }
+
+                                        CommentsList finalCom = new CommentsList(theList);
 
 
-                                    images.add(imageUrl);
+                                        ArrayList<String> voters = (ArrayList<String>) userData.get("voters");
+                                        ArrayList<String> upVoters = (ArrayList<String>) userData.get("upvoters");
+                                        ArrayList<String> downVoters = (ArrayList<String>) userData.get("downvoters");
+
+                                        ArrayList<String> tags = (ArrayList<String>) userData.get("tags");
+                                        ArrayList<String> answersId = (ArrayList<String>) userData.get("answers");
 
 
-                                    qImage = (ParseFile) userData.get("image3");
+                                        ArrayList<String> images = new ArrayList<String>();
 
-                                    if(qImage == null){
+                                        ParseFile qImage = (ParseFile) userData.get("image1");
+                                        if (qImage == null) {
 
-                                    }else{
-                                        imageUrl = qImage.getUrl() ;//live url
+                                            // Create BasicQuestion with no images
+                                            BasicQuestion basicQuestion = new BasicQuestion(owner, title, description, postId, postDate, voters, tags, answersId);
+                                            basicQuestion.setHasAnswer(hasAnswer);
+                                            basicQuestion.setEdited(edited);
+                                            basicQuestion.setVotes(upVotes - downVotes);
+                                            basicQuestion.setCommentsList(finalCom);
+                                            basicQuestion.setUpVoters(upVoters);
+                                            basicQuestion.setDownVoters(downVoters);
+                                            basicQuestion.setUpVotes(upVotes);
+                                            basicQuestion.setDownVotes(downVotes);
+                                            basicQuestion.setProUrl(imgUrl);
+                                            items.add(basicQuestion);
 
-                                        images.add(imageUrl);
+                                        } else {
+                                            String imageUrl = qImage.getUrl();//live url
+
+
+                                            images.add(imageUrl);
+
+
+                                            qImage = (ParseFile) userData.get("image2");
+
+                                            if (qImage == null) {
+                                                //Do nothing
+                                            } else {
+                                                imageUrl = qImage.getUrl();//live url
+
+
+                                                images.add(imageUrl);
+
+
+                                                qImage = (ParseFile) userData.get("image3");
+
+                                                if (qImage == null) {
+
+                                                } else {
+                                                    imageUrl = qImage.getUrl();//live url
+
+                                                    images.add(imageUrl);
+                                                }
+
+
+                                            }
+
+                                            //Create ImageQuestion
+                                            ImageQuestion imageQuestion = new ImageQuestion(owner, title, description, postId, postDate, tags, answersId, images, voters);
+                                            imageQuestion.setHasAnswer(hasAnswer);
+                                            imageQuestion.setEdited(edited);
+                                            imageQuestion.setVotes(upVotes - downVotes);
+                                            imageQuestion.setCommentsList(finalCom);
+                                            imageQuestion.setUpVoters(upVoters);
+                                            imageQuestion.setDownVoters(downVoters);
+                                            imageQuestion.setUpVotes(upVotes);
+                                            imageQuestion.setDownVotes(downVotes);
+                                            imageQuestion.setProUrl(imgUrl);
+                                            items.add(imageQuestion);
+                                        }
+
+                                    }
+
+                                    mAdapter = new QuestRecycler(SearchPage.this, items);
+                                    questlv.setAdapter(mAdapter);
+
+                                    if(srchTxt.isEmpty() && fromTag ==false){
+                                        questlv.setVisibility(View.INVISIBLE);
+                                        searchPg.setVisibility(View.INVISIBLE);
+                                    }else if (!srchTxt.isEmpty()){
+                                        questlv.setVisibility(View.VISIBLE);
+                                        searchPg.setVisibility(View.INVISIBLE);
+                                    }else if(fromTag == true){
+                                        questlv.setVisibility(View.VISIBLE);
+                                        searchPg.setVisibility(View.INVISIBLE);
                                     }
 
 
+
+                                    items = new ArrayList<BasicPost>();
+
+
                                 }
-
-                                //Create ImageQuestion
-                                ImageQuestion imageQuestion = new ImageQuestion(owner,title,description,postId,postDate,tags,answersId,images,voters);
-                                imageQuestion.setHasAnswer(hasAnswer);
-                                imageQuestion.setEdited(edited);
-                                imageQuestion.setVotes(upVotes-downVotes);
-                                items.add(imageQuestion);
-                            }
+                            });
 
 
                         }
 
-                        mAdapter = new QuestRecycler(SearchPage.this,items);
 
 
-                        questlv.setAdapter(mAdapter);
-
-                        if(srchTxt.isEmpty() && fromTag ==false){
-                            questlv.setVisibility(View.INVISIBLE);
-                            searchPg.setVisibility(View.INVISIBLE);
-                        }else if (!srchTxt.isEmpty()){
-                            questlv.setVisibility(View.VISIBLE);
-                            searchPg.setVisibility(View.INVISIBLE);
-                        }else if(fromTag == true){
-                            questlv.setVisibility(View.VISIBLE);
-                            searchPg.setVisibility(View.INVISIBLE);
-                        }
-
-
-
-                        items = new ArrayList<BasicPost>();
 
                     }
                 }

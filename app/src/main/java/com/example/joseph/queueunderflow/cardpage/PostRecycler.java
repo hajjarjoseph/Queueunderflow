@@ -31,6 +31,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.joseph.queueunderflow.QuestItem;
+import com.example.joseph.queueunderflow.QuestRecycler;
 import com.example.joseph.queueunderflow.R;
 import com.example.joseph.queueunderflow.alerts.OthersPostAlert;
 import com.example.joseph.queueunderflow.alerts.OwnPostAlert;
@@ -75,6 +76,7 @@ import com.example.joseph.queueunderflow.profile.ProfileActivity;
 import com.example.joseph.queueunderflow.reputation.ReputationFactory;
 import com.example.joseph.queueunderflow.submitpost.SubmitQuestion;
 import com.example.joseph.queueunderflow.viewpager.ViewPagerAdapter;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
@@ -155,13 +157,13 @@ private RecyclerView postlv;
         switch (viewType) {
             case 1:
                  inflatedView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.answerwimage, parent, false);
+                        .inflate(R.layout.newanswerslayout, parent, false);
                 return new PhotoHolder(inflatedView);
 
 
             case 0:
                  inflatedView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.postwimage, parent, false);
+                        .inflate(R.layout.newdetailedquestion, parent, false);
                 return new PhotoHolder(inflatedView);
 
         }
@@ -250,6 +252,36 @@ private RecyclerView postlv;
                 holder.intro_images.setCurrentItem(0);
             }
 
+            ParseQuery fetchUser = new ParseQuery("_User");
+            fetchUser.whereEqualTo("username", theQuestion.getAnswersList().get(position-1).getqOwner().substring(1));
+
+            fetchUser.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(java.util.List<ParseObject> objects, ParseException e) {
+                    if (e == null) {
+                        for (ParseObject profileData : objects) {
+
+
+                            ParseFile  proImg = (ParseFile) profileData.get("profilePicture");
+
+                            if (proImg == null) {
+                                holder.profilePic.setImageResource(R.drawable.miniowl);
+                            } else {
+                                String imgUrl = proImg.getUrl();
+                                Uri imgUri = Uri.parse(imgUrl);
+
+                                Glide
+                                        .with(context)
+                                        .load(imgUri)
+                                        .into(holder.profilePic);
+
+
+                            }
+                        }
+                    }
+                }
+            });
+
 
             final ArrayList<String> theVoters = theQuestion.getAnswersList().get(position-1).getVoters();
 
@@ -262,30 +294,54 @@ private RecyclerView postlv;
             }
 
             if(alreadyVoted) {
-                holder.upBtn.setVisibility(View.GONE);
-                holder.downBtn.setVisibility(View.GONE);
-                int totalVotes = theQuestion.getAnswersList().get(position-1).getVotes();
-                holder.votesNum.setText(totalVotes+"");
-                holder.votesNum.setVisibility(View.VISIBLE);
+                int numUpvotes = theQuestion.getUpVotes();
+                int numDownvotes = theQuestion.getDownVotes();
+
+                int totalDownVotes = numDownvotes + 1;
+                holder.upBtn.setText("UpVotes " + numUpvotes);
+                holder.downBtn.setText("DownVotes " + totalDownVotes);
+
+                holder.upBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                    }
+                });
+
+                holder.downBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                    }
+                });
+
             }else{
 
                 holder.upBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        holder.upBtn.setVisibility(View.INVISIBLE);
-                        holder.downBtn.setVisibility(View.INVISIBLE);
-                        holder.votesNum.setVisibility(View.VISIBLE);
-                        int totalVotes = theQuestion.getAnswersList().get(position-1).getVotes() + 1;
-                        theQuestion.getAnswersList().get(position-1).setVotes(totalVotes);
-                        holder.votesNum.setText("" + totalVotes);
+                        int totalVotes = theQuestion.getVotes() + 1;
+                        int upVotes = theQuestion.getUpVotes();
+
+                        int totalUpvotes = upVotes + 1;
+
+                        holder.upBtn.setText("UpVote " + totalUpvotes);
+                        theQuestion.setVotes(totalVotes);
 
 
 
 
 
-
-                        reputationGiver = new ReputationFactory(theQuestion.getAnswersList().get(position-1).getqOwner().substring(1),2);
+                        reputationGiver = new ReputationFactory(theQuestion.getqOwner().substring(1),2);
                         reputationGiver.giveReputation();
+
+                        holder.upBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                            }
+                        });
+
 
                         ParseQuery findPost = new ParseQuery("Answers");
                         findPost.whereEqualTo("objectId",theQuestion.getAnswersList().get(position-1).getPostId());
@@ -303,6 +359,7 @@ private RecyclerView postlv;
                                         votez.add(ParseUser.getCurrentUser().getUsername());
                                         theQuestion.getAnswersList().get(position-1).setVoters(votez);
                                         userData.add("voters",ParseUser.getCurrentUser().getUsername());
+                                        userData.add("upvoters",ParseUser.getCurrentUser().getUsername());
                                         userData.saveInBackground();
 
                                     }
@@ -317,12 +374,15 @@ private RecyclerView postlv;
                 holder.downBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        holder.upBtn.setVisibility(View.GONE);
-                        holder.downBtn.setVisibility(View.GONE);
-                        holder.votesNum.setVisibility(View.VISIBLE);
-                        int totalVotes = theQuestion.getAnswersList().get(position-1).getVotes() - 1;
-                        theQuestion.getAnswersList().get(position-1).setVotes(totalVotes);
-                        holder.votesNum.setText("" + totalVotes);
+
+                        int totalVotes = theQuestion.getVotes() - 1;
+                        int downVotes = theQuestion.getDownVotes();
+
+                        holder.downBtn.setText("Downvotes " + downVotes +1);
+
+                        theQuestion.setVotes(totalVotes);
+
+
                         ParseQuery findPost = new ParseQuery("Answers");
                         findPost.whereEqualTo("objectId",theQuestion.getAnswersList().get(position-1).getPostId());
                         findPost.findInBackground(new FindCallback<ParseObject>() {
@@ -339,6 +399,7 @@ private RecyclerView postlv;
                                         votez.add(ParseUser.getCurrentUser().getUsername());
                                         theQuestion.getAnswersList().get(position-1).setVoters(votez);
                                         userData.add("voters",ParseUser.getCurrentUser().getUsername());
+                                        userData.add("downvoters",ParseUser.getCurrentUser().getUsername());
                                         userData.saveInBackground();
 
                                     }
@@ -414,6 +475,7 @@ private RecyclerView postlv;
             }
 
 
+            /*
             holder.shareBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -434,7 +496,7 @@ private RecyclerView postlv;
             });
 
 
-
+*/
             holder.setUiPageViewController();
 
 
@@ -447,6 +509,54 @@ private RecyclerView postlv;
             long now = System.currentTimeMillis();
 
             final String theOwner = theQuestion.getqOwner().toString();
+
+            ArrayList<String> tags = theQuestion.getTags();
+
+            ParseQuery fetchUser = new ParseQuery("_User");
+            fetchUser.whereEqualTo("username", theQuestion.getqOwner().substring(1));
+
+            fetchUser.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(java.util.List<ParseObject> objects, ParseException e) {
+                    if (e == null) {
+                        for (ParseObject profileData : objects) {
+
+
+                            ParseFile  proImg = (ParseFile) profileData.get("profilePicture");
+
+                            if (proImg == null) {
+                                holder.profilePic.setImageResource(R.drawable.miniowl);
+                            } else {
+                                String imgUrl = proImg.getUrl();
+                                Uri imgUri = Uri.parse(imgUrl);
+
+                                Glide
+                                        .with(context)
+                                        .load(imgUri)
+                                        .into(holder.profilePic);
+
+
+                            }
+                        }
+                    }
+                }
+            });
+
+            if(!tags.isEmpty()) {
+                String tag = tags.get(0);
+
+                holder.skillName1.setText(tag);
+                String  skillDraw = nametoDrawable(tag);
+
+                final int imgRess = context.getResources().getIdentifier(skillDraw, null, context.getPackageName());
+
+                Log.d(QuestRecycler.class.getSimpleName(),"el fekra  eno : " + imgRess);
+
+                holder.skillPic1.setImageResource(imgRess);
+
+            }
+
+
 
             holder.postOwner.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -463,6 +573,7 @@ private RecyclerView postlv;
                 }
             });
 
+            /*
             holder.shareBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -481,13 +592,18 @@ private RecyclerView postlv;
                 }
             });
 
+            */
+
             holder.postOwner.setText(theOwner);
 
             if(theQuestion.isEdited()){
                 holder.editedText.setVisibility(View.VISIBLE);
             }
 
+
+
             final ArrayList<String> theVoters = theQuestion.getVoters();
+
 
             boolean alreadyVoted = false;
             for(int i=0;i<theVoters.size();i++){
@@ -498,26 +614,52 @@ private RecyclerView postlv;
             }
 
             if(alreadyVoted) {
-                holder.upBtn.setVisibility(View.GONE);
-                holder.downBtn.setVisibility(View.GONE);
-                int totalVotes = theQuestion.getVotes();
-                holder.votesNum.setText(totalVotes+"");
-                holder.votesNum.setVisibility(View.VISIBLE);
+                int numUpvotes = theQuestion.getUpVotes();
+                int numDownvotes = theQuestion.getDownVotes();
+
+                holder.upBtn.setText("UpVotes " + numUpvotes);
+                holder.downBtn.setText("DownVotes " + numDownvotes);
+
+                holder.upBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                    }
+                });
+
+                holder.downBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                    }
+                });
+
             }else{
 
                 holder.upBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        holder.upBtn.setVisibility(View.INVISIBLE);
-                        holder.downBtn.setVisibility(View.INVISIBLE);
-                        holder.votesNum.setVisibility(View.VISIBLE);
+
                         int totalVotes = theQuestion.getVotes() + 1;
+                        int upVotes = theQuestion.getUpVotes();
+
+                        int totalUpVotes = upVotes + 1;
+                        holder.upBtn.setText("UpVote " + totalUpVotes);
                         theQuestion.setVotes(totalVotes);
-                        holder.votesNum.setText("" + totalVotes);
+
+
+
 
 
                         reputationGiver = new ReputationFactory(theQuestion.getqOwner().substring(1),2);
                         reputationGiver.giveReputation();
+
+                        holder.upBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                            }
+                        });
 
                         ParseQuery findPost = new ParseQuery("Questions");
                         findPost.whereEqualTo("objectId",theQuestion.getPostId());
@@ -532,6 +674,7 @@ private RecyclerView postlv;
                                         userData.increment("upvotes");
                                         userData.increment("Votes");
                                         userData.add("voters",ParseUser.getCurrentUser().getUsername());
+                                        userData.add("upvoters",ParseUser.getCurrentUser().getUsername());
                                         userData.saveInBackground();
 
                                     }
@@ -546,12 +689,17 @@ private RecyclerView postlv;
                 holder.downBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        holder.upBtn.setVisibility(View.GONE);
-                        holder.downBtn.setVisibility(View.GONE);
-                        holder.votesNum.setVisibility(View.VISIBLE);
+
+
                         int totalVotes = theQuestion.getVotes() - 1;
+                        int downVotes = theQuestion.getDownVotes();
+
+                        int totalDownVotes = downVotes + 1;
+
+                        holder.downBtn.setText("Downvotes " + totalDownVotes);
+
                         theQuestion.setVotes(totalVotes);
-                        holder.votesNum.setText("" + totalVotes);
+
                         ParseQuery findPost = new ParseQuery("Questions");
                         findPost.whereEqualTo("objectId",theQuestion.getPostId());
                         findPost.findInBackground(new FindCallback<ParseObject>() {
@@ -565,6 +713,7 @@ private RecyclerView postlv;
                                         userData.increment("downvotes");
                                         userData.increment("Votes");
                                         userData.add("voters",ParseUser.getCurrentUser().getUsername());
+                                        userData.add("downvoters",ParseUser.getCurrentUser().getUsername());
                                         userData.saveInBackground();
 
                                     }
@@ -696,11 +845,12 @@ private RecyclerView postlv;
         TextView votesNum;
         ViewPager intro_images;
         ImageView answerPicker;
-        ImageView upBtn;
-        ImageView downBtn;
+        CircularImageView profilePic;
+        Button upBtn;
+        TextView downBtn;
         ImageView shareBtn;
         Button pickAnswerBtn;
-        ImageView commentBtn;
+        TextView commentBtn;
         ImageView options;
         LinearLayout pager_indicator;
         private int dotsCount;
@@ -709,6 +859,8 @@ private RecyclerView postlv;
         private Context contxt;
         private TextView timeago;
         private TextView editedText;
+        private TextView skillName1;
+        private ImageView skillPic1;
 
      private ArrayList<Integer> calcHeights;
 
@@ -742,10 +894,13 @@ private RecyclerView postlv;
             postTitle=(TextView) v.findViewById(R.id.postTitle);
             votesNum=(TextView) v.findViewById(R.id.votesNum);
             pickAnswerBtn=(Button) v.findViewById(R.id.pickAnswerBtn);
-            commentBtn=(ImageView) v.findViewById(R.id.commentBtn);
+            commentBtn=(TextView) v.findViewById(R.id.commentBtn);
+            skillName1=(TextView) v.findViewById(R.id.skillNameqItem1);
+            skillPic1=(ImageView) v.findViewById(R.id. skillPicqItem1);
             answerPicker=(ImageView) v.findViewById(R.id.theAnsPick);
-            upBtn=(ImageView) v.findViewById(R.id.upBtn);
-            downBtn=(ImageView) v.findViewById(R.id.downBtn);
+            profilePic=(CircularImageView) v.findViewById(R.id.profilePic);
+            upBtn=(Button) v.findViewById(R.id.upBtn);
+            downBtn=(TextView) v.findViewById(R.id.downBtn);
             shareBtn=(ImageView) v.findViewById(R.id.shareBtn);
             options=(ImageView) v.findViewById(R.id.postOption);
             postDescription=(TextView) v.findViewById(R.id.postDescription);
